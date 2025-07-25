@@ -141,10 +141,17 @@ graph TD
 
 ```text
 simulador_fisiologia_pulmonar/
-├── backend/               # Código Python (FastAPI + simulación)
-│   ├── app/               # Endpoints y lógica de aplicación
-│   ├── models/            # Clases de simulación (NumPy, SciPy)
-│   ├── tests/             # Pruebas pytest
+├── backend/
+│   ├── app/               # Endpoints y lógica de la API (FastAPI)
+│   ├── models/            # Módulos del modelo fisiológico
+│   │   ├── __init__.py    # Convierte a models en un paquete
+│   │   ├── paciente.py    # Clase Paciente
+│   │   ├── ventilador.py  # Clase Ventilador
+│   │   ├── simulador.py   # Clase orquestadora principal
+│   │   ├── intercambio.py # Módulo de intercambio gaseoso
+│   │   ├── hemodinamica.py# Módulo de interacción corazón-pulmon
+│   │   └── control.py     # Módulo de control respiratorio
+│   ├── tests/             # Pruebas para todos los módulos
 │   └── Dockerfile
 ├── frontend/              # Código React
 │   ├── src/
@@ -155,6 +162,7 @@ simulador_fisiologia_pulmonar/
 ├── .github/workflows/     # CI/CD (GitHub Actions)
 ├── README.md              # Documentación del proyecto
 └── SRD_Simulador_Fisiologia_Pulmonar.md  # Requisitos de software
+
 ```  
 
 ## Contribuciones
