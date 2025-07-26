@@ -1,14 +1,20 @@
-# Usar una imagen oficial de Python como base
-FROM python:3.11-slim
+# Usar una imagen oficial de Node.js como base
+FROM node:20-slim
 
 # Establecer el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Instalar las librerías científicas que necesitamos
-RUN pip install numpy scipy matplotlib jupyter
+# Copiar los archivos de dependencias
+COPY package.json package-lock.json* ./
 
-# Exponer el puerto que Jupyter usará para que podamos acceder desde el navegador
-EXPOSE 8888
+# Instalar las dependencias
+RUN npm install
 
-# El comando que se ejecutará cuando inicie el contenedor
-CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
+# Copiar el resto del código fuente
+COPY . .
+
+# Exponer el puerto que usará Vite (por defecto 3000)
+EXPOSE 3000
+
+# Comando para iniciar el servidor de desarrollo de Vite
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
