@@ -5,3 +5,5 @@ scipy
 pydantic
 black
 flake8
+pytest
+httpx

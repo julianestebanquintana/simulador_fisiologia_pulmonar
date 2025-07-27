@@ -1,10 +1,6 @@
 # Librerías
 import numpy as np
-from scipy.integrate import solve_ivp
-import matplotlib.pyplot as plt
-
-# Estilo
-plt.style.use('seaborn-v0_8-whitegrid')
+# from .ventilador import Ventilador
 
 class IntercambioGases:
     """

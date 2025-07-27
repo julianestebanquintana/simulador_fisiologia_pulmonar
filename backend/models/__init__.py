@@ -1,7 +1,8 @@
 # backend/models/__init__.py
 
 """
-Este paquete contiene las clases fundamentales para la simulación de fisiología pulmonar.
+Este paquete contiene las clases fundamentales para 
+la simulación de fisiología pulmonar.
 """
 
 from .paciente import Paciente

@@ -1,10 +1,5 @@
 # Librerías
 import numpy as np
-from scipy.integrate import solve_ivp
-import matplotlib.pyplot as plt
-
-# Estilo
-plt.style.use('seaborn-v0_8-whitegrid')
 
 class Ventilador:
     """Parámetros y perfiles de ventilación mecánica."""
@@ -38,7 +33,7 @@ class Ventilador:
         elif self.modo == 'VCV':
             return np.full_like(t_arr, self.PEEP)
         else:
-            raise ValueError(f"Modo desconocido: {modo}")
+            raise ValueError(f"Modo desconocido: {self.modo}")
 
     def flujo(self, t: float) -> np.ndarray:
         """Perfil de flujo inspirado en VCV, 0 fuera de inspiración."""

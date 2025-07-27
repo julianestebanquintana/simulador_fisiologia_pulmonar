@@ -1,10 +1,14 @@
 # Librerías
 import numpy as np
 from scipy.integrate import solve_ivp
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 # Estilo
-plt.style.use('seaborn-v0_8-whitegrid')
+#plt.style.use('seaborn-v0_8-whitegrid')
+
+from .paciente import Paciente
+from .ventilador import Ventilador
+from .control import ControlRespiratorio
 
 class Simulador:
     """Orquesta la simulación paciente-ventilador."""
@@ -95,35 +99,35 @@ class Simulador:
             'P_aw': P_aw
         }
 
-    def graficar_resultados(self,
-                            resultados: dict,
-                            titulo: str = 'Simulación Pulmonar'):
-        """Grafica presión, flujo total y volumen total a partir del diccionario
-        de resultados."""
-        t = resultados['t']
-        P_aw = resultados['P_aw']
-        flujo = resultados['flow']
-        Vt = resultados['Vt']
+    # def graficar_resultados(self,
+    #                         resultados: dict,
+    #                         titulo: str = 'Simulación Pulmonar'):
+    #     """Grafica presión, flujo total y volumen total a partir del diccionario
+    #     de resultados."""
+    #     t = resultados['t']
+    #     P_aw = resultados['P_aw']
+    #     flujo = resultados['flow']
+    #     Vt = resultados['Vt']
 
-        fig, axs = plt.subplots(3, 1, figsize=(15, 10), sharex=True)
-        fig.suptitle(titulo, fontsize=16)
+    #     fig, axs = plt.subplots(3, 1, figsize=(15, 10), sharex=True)
+    #     fig.suptitle(titulo, fontsize=16)
 
-        # Presión
-        axs[0].plot(t, P_aw, color='red', label='Presión (P_aw)')
-        axs[0].set_ylabel('Presión (cmH2O)')
-        axs[0].legend()
+    #     # Presión
+    #     axs[0].plot(t, P_aw, color='red', label='Presión (P_aw)')
+    #     axs[0].set_ylabel('Presión (cmH2O)')
+    #     axs[0].legend()
 
-        # Flujo
-        axs[1].plot(t, flujo, color='blue', label='Flujo Total')
-        axs[1].set_ylabel('Flujo (L/s)')
-        axs[1].axhline(0, color='grey', linewidth=0.8)
-        axs[1].legend()
+    #     # Flujo
+    #     axs[1].plot(t, flujo, color='blue', label='Flujo Total')
+    #     axs[1].set_ylabel('Flujo (L/s)')
+    #     axs[1].axhline(0, color='grey', linewidth=0.8)
+    #     axs[1].legend()
 
-        # Volumen
-        axs[2].plot(t, Vt, color='green', label='Volumen (L)')
-        axs[2].set_ylabel('Volumen (L)')
-        axs[2].set_xlabel('Tiempo (s)')
-        axs[2].legend()
+    #     # Volumen
+    #     axs[2].plot(t, Vt, color='green', label='Volumen (L)')
+    #     axs[2].set_ylabel('Volumen (L)')
+    #     axs[2].set_xlabel('Tiempo (s)')
+    #     axs[2].legend()
 
-        plt.tight_layout(rect=[0, 0, 1, 0.96])
-        plt.show()
+    #     plt.tight_layout(rect=[0, 0, 1, 0.96])
+    #     plt.show()

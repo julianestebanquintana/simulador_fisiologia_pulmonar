@@ -1,10 +1,6 @@
 # Librerías
 import numpy as np
-from scipy.integrate import solve_ivp
-import matplotlib.pyplot as plt
-
-# Estilo
-plt.style.use('seaborn-v0_8-whitegrid')
+from .ventilador import Ventilador
 
 class InteraccionCorazonPulmon:
     """
@@ -29,7 +25,8 @@ class InteraccionCorazonPulmon:
         k_sensibilidad : float
             Factor de sensibilidad hemodinámica a la presión intratorácica.
             Un valor bajo (~0.05-0.1) simula un paciente normovolémico.
-            Un valor alto (>0.2) simula un paciente hipovolémico o con disfunción cardíaca.
+            Un valor alto (>0.2) simula un paciente hipovolémico o con 
+            disfunción cardíaca.
         hb_g_dl : float
             Concentración de hemoglobina en g/dL.
         """
@@ -93,7 +90,7 @@ class InteraccionCorazonPulmon:
         p_aw_ultimo_ciclo = P_aw[t >= t[-1] - tiempo_total_ciclo]
         t_ultimo_ciclo = t[t >= t[-1] - tiempo_total_ciclo]
 
-        area_bajo_curva = np.trapz(p_aw_ultimo_ciclo, t_ultimo_ciclo)
+        area_bajo_curva = np.trapezoid(p_aw_ultimo_ciclo, t_ultimo_ciclo)
         P_mean = area_bajo_curva / (t_ultimo_ciclo[-1] - t_ultimo_ciclo[0])
 
         # 2. Calcular Gasto Cardíaco Actual
