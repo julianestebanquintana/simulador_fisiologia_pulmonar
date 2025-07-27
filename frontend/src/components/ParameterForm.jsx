@@ -78,13 +78,24 @@ function ParameterForm() {
           onChange={(e) => handleVentilatorChange(e, 'respiratoryRate')}
         />
       </div>
-      <div className="d-grid">
-        <button className="btn btn-primary btn-lg" onClick={runSimulation}>
-          Ejecutar Simulación
+      <div className="d-grid mt-auto"> {/* mt-auto empuja el botón hacia abajo */}
+        <button 
+          className="btn btn-primary btn-lg" 
+          onClick={runSimulation}
+          disabled={simulationState.isLoading} // <-- Deshabilita el botón al cargar
+        >
+          {simulationState.isLoading ? 'Simulando...' : 'Ejecutar Simulación'}
         </button>
+        {/* Mensaje si hay un error */}
+        {simulationState.error && (
+          <div className="alert alert-danger mt-2" role="alert">
+            Error: {simulationState.error}
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
 
 export default ParameterForm;
