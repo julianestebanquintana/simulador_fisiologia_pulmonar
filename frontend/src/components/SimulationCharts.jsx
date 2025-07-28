@@ -22,6 +22,7 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+const SIMULATION_WINDOW_SECONDS = 30; // Ventana de tiempo
 
 // Opciones base para todos los gráficos
 const baseChartOptions = {
@@ -54,11 +55,23 @@ function SingleChart({ title, yLabel, data, borderColor, backgroundColor, yMin }
   const chartOptions = {
     ...baseChartOptions,
     plugins: {
-      legend: { display: false },
-      title: { display: true, text: title },
+      legend: {
+        display: false, // No necesitamos una leyenda para un solo set de datos
+      },
+      title: {
+        display: true,
+        text: title, // Usamos el título que pasamos como prop
+      },
     },
     scales: {
       ...baseChartOptions.scales,
+      x: {
+        type: 'linear',
+        min: 0,
+        max: SIMULATION_WINDOW_SECONDS,
+        title: { display: true, text: 'Tiempo (s)' },
+        ticks: { maxTicksLimit: 8, autoSkip: true },
+      },
       y: {
         title: { display: true, text: yLabel },
         suggestedMin: yMin,
@@ -92,11 +105,26 @@ function SimulationCharts() {
     );
   }
 
-  // Preparar los datos
-  const labels = results.series_tiempo.tiempo.map(t => t.toFixed(2));
-  const pressureData = { labels, values: results.series_tiempo.presion_via_aerea };
-  const flowData = { labels, values: results.series_tiempo.flujo_total };
-  const volumeData = { labels, values: results.series_tiempo.volumen_total };
+  const timeArray = results.series_tiempo.tiempo;
+
+  // Encontramos cuántos puntos de datos caben en nuestra ventana de 15 segundos
+  let pointsToShow = timeArray.length;
+  for (let i = 0; i < timeArray.length; i++) {
+    if (timeArray[i] > SIMULATION_WINDOW_SECONDS) {
+      pointsToShow = i;
+      break;
+    }
+  }
+
+  // Recortamos todos los arrays al mismo tamaño
+  const labels = timeArray.slice(0, pointsToShow).map(t => t.toFixed(2));
+  const pressureValues = results.series_tiempo.presion_via_aerea.slice(0, pointsToShow);
+  const flowValues = results.series_tiempo.flujo_total.slice(0, pointsToShow);
+  const volumeValues = results.series_tiempo.volumen_total.slice(0, pointsToShow);
+
+  const pressureData = { labels, values: pressureValues };
+  const flowData = { labels, values: flowValues };
+  const volumeData = { labels, values: volumeValues };
 
   return (
     // Contenedor principal

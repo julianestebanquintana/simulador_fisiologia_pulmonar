@@ -42,14 +42,13 @@ function ParameterForm() {
   };
 
   return (
-    <div className="d-flex flex-column h-100">
-      <div className="flex-grow-1">
+    <div className="control-panel">
+      <div className="control-panel__sliders">
         <h5 className="mt-3">Parámetros del Paciente</h5>
         <ParameterSlider label="Resistencia 1 (R1)" name="R1" value={simulationState.patient.R1} min="5" max="50" step="1" unit="cmH2O/L/s" onChange={handlePatientChange} />
         <ParameterSlider label="Compliancia 1 (C1)" name="C1" value={simulationState.patient.C1} min="0.01" max="0.1" step="0.005" unit="L/cmH2O" onChange={handlePatientChange} />
         <ParameterSlider label="Resistencia 2 (R2)" name="R2" value={simulationState.patient.R2} min="5" max="50" step="1" unit="cmH2O/L/s" onChange={handlePatientChange} />
         <ParameterSlider label="Compliancia 2 (C2)" name="C2" value={simulationState.patient.C2} min="0.01" max="0.1" step="0.005" unit="L/cmH2O" onChange={handlePatientChange} />
-
         <h5 className="mt-4">Parámetros del Ventilador</h5>
         <div className="mb-3">
           <label htmlFor="vent-mode" className="form-label">Modo Ventilatorio</label>
@@ -58,18 +57,27 @@ function ParameterForm() {
             <option value="VCV">Controlado por Volumen (VCV)</option>
           </select>
         </div>
+
+        {/* Condicional que cambia según el modo ventilatorio*/}
+        {simulationState.ventilator.modo === 'PCV' ? (
+          <ParameterSlider label="Presión de Conducción" name="P_driving" value={simulationState.ventilator.P_driving} min="5" max="35" step="1" unit="cmH2O" onChange={handleVentilatorChange} />
+        ) : (
+          <ParameterSlider label="Volumen Tidal" name="Vt" value={simulationState.ventilator.Vt} min="0.1" max="1.0" step="0.05" unit="L" onChange={handleVentilatorChange} />
+        )}
+
         <ParameterSlider label="PEEP" name="PEEP" value={simulationState.ventilator.PEEP} min="0" max="25" step="1" unit="cmH2O" onChange={handleVentilatorChange} />
-        <ParameterSlider label="Presión de Conducción" name="P_driving" value={simulationState.ventilator.P_driving} min="5" max="35" step="1" unit="cmH2O" onChange={handleVentilatorChange} />
         <ParameterSlider label="Frecuencia Respiratoria" name="fr" value={simulationState.ventilator.fr} min="8" max="40" step="1" unit="rpm" onChange={handleVentilatorChange} />
-        <ParameterSlider label="FiO₂" name="FiO2" value={simulationState.ventilator.FiO2} min="0.21" max="1.0" step="0.01" unit="%" onChange={handleVentilatorChange} />
+        <ParameterSlider label="FiO₂" name="FiO2" value={simulationState.ventilator.FiO2} min="0.21" max="1.0" step="0.01" unit="" onChange={handleVentilatorChange} />
+      
       </div>
-      <div className="d-grid mt-auto">
+
+      <div className="d-grid mt-auto pt-3 border-top">
         <button className="btn btn-primary btn-lg" onClick={runSimulation} disabled={simulationState.isLoading}>
           {simulationState.isLoading ? 'Simulando...' : 'Ejecutar Simulación'}
         </button>
         {simulationState.error && <div className="alert alert-danger mt-2">{simulationState.error}</div>}
       </div>
-    </div>
+    </div> 
   );
 }
 

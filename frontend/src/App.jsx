@@ -14,8 +14,8 @@ function App() {
 
       <main className="row main-content">
         {/* Columna Izquierda: Panel de Control */}
-        <aside className="col-md-4 border-end">
-          <div className="p-3 h-100">
+        <aside className="col-md-4 border-end d-flex flex-column">
+          <div className="p-3" style={{ overflowY: 'auto' }}>
             <ParameterForm />
           </div>
         </aside>

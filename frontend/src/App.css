@@ -26,3 +26,15 @@
   /* Esto es clave para evitar que el contenido desborde y force el crecimiento */
   min-height: 0;
 }
+
+/* Panel de control */
+.control-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.control-panel__sliders {
+  overflow-y: auto; /* Habilita el scroll vertical si es necesario */
+  flex-grow: 1;
+}
