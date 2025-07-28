@@ -23,79 +23,84 @@ ChartJS.register(
   Legend
 );
 
-const chartOptions = {
+// Opciones base para todos los gráficos
+const baseChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  animation: {
-    duration: 0, // Desactivar animaciones para una respuesta instantánea
-  },
-  elements: {
-    point: {
-      radius: 0, // No mostrar puntos en la línea
-    },
-  },
+  animation: { duration: 0 },
+  elements: { point: { radius: 0 } },
   scales: {
     x: {
-      ticks: {
-        maxTicksLimit: 10, // Limitar el número de etiquetas en el eje X
-      },
+      ticks: { maxTicksLimit: 10, autoSkip: true },
+      title: { display: true, text: 'Tiempo (s)' },
     },
   },
 };
 
+// Componente para un único gráfico
+const SingleChart = ({ title, yLabel, data, borderColor, backgroundColor }) => {
+  const chartData = {
+    labels: data.labels,
+    datasets: [{
+      label: yLabel,
+      data: data.values,
+      borderColor,
+      backgroundColor,
+      borderWidth: 2,
+      tension: 0.1
+    }]
+  };
+
+  const chartOptions = {
+    ...baseChartOptions,
+    plugins: { legend: { display: false }, title: { display: true, text: title } },
+    scales: { ...baseChartOptions.scales, y: { title: { display: true, text: yLabel } } }
+  };
+
+  return <Line options={chartOptions} data={chartData} />;
+};
+
+// Componente principal que renderiza los tres gráficos
 function SimulationCharts() {
   const { simulationState } = useSimulation();
-  const { results } = simulationState;
+  const { results, isLoading } = simulationState;
 
-  if (!results) {
+  if (isLoading) {
     return (
       <div className="d-flex align-items-center justify-content-center h-100">
-        <p className="text-muted">Ejecuta una simulación para ver los resultados.</p>
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </div>
       </div>
     );
   }
 
-  const chartData = {
-    labels: results.series_tiempo.tiempo.map(t => t.toFixed(2)),
-    datasets: [
-      {
-        label: 'Presión (cmH2O)',
-        data: results.series_tiempo.presion_via_aerea,
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        yAxisID: 'y',
-      },
-      {
-        label: 'Flujo (L/s)',
-        data: results.series_tiempo.flujo_total,
-        borderColor: 'rgb(54, 162, 235)',
-        backgroundColor: 'rgba(54, 162, 235, 0.5)',
-        yAxisID: 'y1',
-      },
-      {
-        label: 'Volumen (L)',
-        data: results.series_tiempo.volumen_total,
-        borderColor: 'rgb(75, 192, 192)',
-        backgroundColor: 'rgba(75, 192, 192, 0.5)',
-        yAxisID: 'y2',
-      },
-    ],
-  };
+  if (!results) {
+    return (
+      <div className="d-flex align-items-center justify-content-center h-100 text-muted">
+        Ejecuta una simulación para ver los resultados.
+      </div>
+    );
+  }
 
-  const optionsWithMultipleAxes = {
-    ...chartOptions,
-    scales: {
-      ...chartOptions.scales,
-      y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Presión' } },
-      y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Flujo' } },
-      y2: { type: 'linear', display: false }, // Ocultamos este eje para no saturar
-    }
-  };
-
+  // Preparar los datos
+  const labels = results.series_tiempo.tiempo.map(t => t.toFixed(2));
+  const pressureData = { labels, values: results.series_tiempo.presion_via_aerea };
+  const flowData = { labels, values: results.series_tiempo.flujo_total };
+  const volumeData = { labels, values: results.series_tiempo.volumen_total };
 
   return (
-    <div className="h-100">
-      <Line options={optionsWithMultipleAxes} data={chartData} />
+    // Contenedor principal
+    <div className="d-flex flex-column h-100">
+      <div className="chart-wrapper">
+        <SingleChart title="Presión en la Vía Aérea" yLabel="Presión (cmH2O)" data={pressureData} borderColor="rgb(255, 99, 132)" backgroundColor="rgba(255, 99, 132, 0.5)" />
+      </div>
+      <div className="chart-wrapper mt-3">
+        <SingleChart title="Flujo Respiratorio" yLabel="Flujo (L/s)" data={flowData} borderColor="rgb(54, 162, 235)" backgroundColor="rgba(54, 162, 235, 0.5)" />
+      </div>
+      <div className="chart-wrapper mt-3">
+        <SingleChart title="Volumen Tidal" yLabel="Volumen (L)" data={volumeData} borderColor="rgb(75, 192, 192)" backgroundColor="rgba(75, 192, 192, 0.5)" />
+      </div>
     </div>
   );
 }

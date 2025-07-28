@@ -1,42 +1,28 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* Hacemos que el contenedor principal ocupe toda la altura */
+.app-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Permitimos que la sección principal crezca para llenar el espacio */
+.main-content {
+  flex-grow: 1;
+  /* Importante para que los hijos con altura flexible funcionen */
+  min-height: 0;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Contenedor de la columna de visualización */
+.charts-column {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+/* Contenedor específico para cada gráfico */
+.chart-wrapper {
+  flex: 1 1 0; /* Permite que cada gráfico ocupe un tercio del espacio */
+  position: relative;
+  /* Esto es clave para evitar que el contenido desborde y force el crecimiento */
+  min-height: 0;
 }
