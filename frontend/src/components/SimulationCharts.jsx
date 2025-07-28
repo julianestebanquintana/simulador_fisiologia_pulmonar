@@ -38,7 +38,7 @@ const baseChartOptions = {
 };
 
 // Componente para un único gráfico
-const SingleChart = ({ title, yLabel, data, borderColor, backgroundColor }) => {
+function SingleChart({ title, yLabel, data, borderColor, backgroundColor, yMin }) {
   const chartData = {
     labels: data.labels,
     datasets: [{
@@ -47,18 +47,27 @@ const SingleChart = ({ title, yLabel, data, borderColor, backgroundColor }) => {
       borderColor,
       backgroundColor,
       borderWidth: 2,
-      tension: 0.1
-    }]
+      tension: 0.1,
+    }],
   };
 
   const chartOptions = {
     ...baseChartOptions,
-    plugins: { legend: { display: false }, title: { display: true, text: title } },
-    scales: { ...baseChartOptions.scales, y: { title: { display: true, text: yLabel } } }
+    plugins: {
+      legend: { display: false },
+      title: { display: true, text: title },
+    },
+    scales: {
+      ...baseChartOptions.scales,
+      y: {
+        title: { display: true, text: yLabel },
+        suggestedMin: yMin,
+      },
+    },
   };
 
   return <Line options={chartOptions} data={chartData} />;
-};
+}
 
 // Componente principal que renderiza los tres gráficos
 function SimulationCharts() {
@@ -93,13 +102,29 @@ function SimulationCharts() {
     // Contenedor principal
     <div className="d-flex flex-column h-100">
       <div className="chart-wrapper">
-        <SingleChart title="Presión en la Vía Aérea" yLabel="Presión (cmH2O)" data={pressureData} borderColor="rgb(255, 99, 132)" backgroundColor="rgba(255, 99, 132, 0.5)" />
+        <SingleChart 
+          title="Presión en la Vía Aérea" 
+          yLabel="Presión (cmH2O)" 
+          data={pressureData} 
+          borderColor="rgb(255, 99, 132)" 
+          backgroundColor="rgba(255, 99, 132, 0.5)" 
+          yMin={-5} />
       </div>
       <div className="chart-wrapper mt-3">
-        <SingleChart title="Flujo Respiratorio" yLabel="Flujo (L/s)" data={flowData} borderColor="rgb(54, 162, 235)" backgroundColor="rgba(54, 162, 235, 0.5)" />
+        <SingleChart 
+          title="Flujo Respiratorio" 
+          yLabel="Flujo (L/s)" 
+          data={flowData} 
+          borderColor="rgb(54, 162, 235)" 
+          backgroundColor="rgba(54, 162, 235, 0.5)" />
       </div>
       <div className="chart-wrapper mt-3">
-        <SingleChart title="Volumen Tidal" yLabel="Volumen (L)" data={volumeData} borderColor="rgb(75, 192, 192)" backgroundColor="rgba(75, 192, 192, 0.5)" />
+        <SingleChart 
+          title="Volumen Tidal" 
+          yLabel="Volumen (L)" 
+          data={volumeData} 
+          borderColor="rgb(75, 192, 192)" 
+          backgroundColor="rgba(75, 192, 192, 0.5)" />
       </div>
     </div>
   );
