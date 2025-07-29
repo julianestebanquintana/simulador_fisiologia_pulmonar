@@ -1,11 +1,6 @@
 # Librerías
 import numpy as np
 from scipy.integrate import solve_ivp
-#import matplotlib.pyplot as plt
-
-# Estilo
-#plt.style.use('seaborn-v0_8-whitegrid')
-
 from .paciente import Paciente
 from .ventilador import Ventilador
 from .control import ControlRespiratorio
@@ -32,7 +27,9 @@ class Simulador:
             # Lógica para VCV
             en_insp = (t % self.ventilador.T_total) < self.ventilador.Ti
             flow_total = np.where(en_insp, self.ventilador.flow_insp, 0.0)
-            P_aw_insp = (flow_total + (self.paciente.E1 * V1 / self.paciente.R1) + (self.paciente.E2 * V2 / self.paciente.R2)) / ((1.0 / self.paciente.R1) + (1.0 / self.paciente.R2))
+            P_aw_insp = (flow_total + (self.paciente.E1 * V1 / self.paciente.R1) 
+                + (self.paciente.E2 * V2 / self.paciente.R2)) / ((1.0 / self.paciente.R1) 
+                + (1.0 / self.paciente.R2))
             P_aw = np.where(en_insp, P_aw_insp, self.ventilador.PEEP)
         elif self.ventilador.modo == 'PCV':
             # Lógica para PCV
@@ -88,6 +85,21 @@ class Simulador:
                      + (self.paciente.E1 * V1 / self.paciente.R1)
                      + (self.paciente.E2 * V2 / self.paciente.R2))
                     / ((1 / self.paciente.R1) + (1 / self.paciente.R2)))
+
+        # Calcular el Auto-PEEP a partir del volumen atrapado.
+        volumen_atrapado_c1 = V1[-1]
+        volumen_atrapado_c2 = V2[-1]
+        
+        # La presión alveolar en cada compartimento al final de la espiración
+        P_alv_final_c1 = self.paciente.E1 * volumen_atrapado_c1
+        P_alv_final_c2 = self.paciente.E2 * volumen_atrapado_c2
+        
+        # El Auto-PEEP medido en la vía aérea: es una
+        # media ponderada por la conductancia (1/R)
+        conductancia_total = (1 / self.paciente.R1) + (1 / self.paciente.R2)
+        auto_peep_calculado = (P_alv_final_c1 / self.paciente.R1 
+            + P_alv_final_c2 / self.paciente.R2) / conductancia_total
+        
         return {
             't': t,
             'V1': V1,
@@ -96,7 +108,8 @@ class Simulador:
             'flow1': flujo1,
             'flow2': flujo2,
             'flow': flujo_total,
-            'P_aw': P_aw
+            'P_aw': P_aw,
+            'auto_peep': auto_peep_calculado
         }
 
     # def graficar_resultados(self,

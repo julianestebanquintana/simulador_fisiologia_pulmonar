@@ -1,5 +1,3 @@
-# backend/app/endpoints/simulation.py
-
 import logging
 import numpy as np
 from fastapi import APIRouter, HTTPException
@@ -59,8 +57,14 @@ async def run_simulation(request: SimulationRequest):
         resultados_gases = intercambio_gases.calcular(resultados_mecanica)
 
         hemodinamica = InteraccionCorazonPulmon()
+        # Extraer el auto_peep calculado por el módulo mecánico
+        auto_peep_calculado = resultados_mecanica.get('auto_peep', 0.0)
+
         resultados_hemo = hemodinamica.calcular(
-            resultados_mecanica, resultados_gases, ventilador
+            resultados_mecanica, 
+            resultados_gases, 
+            ventilador,
+            auto_peep_cmH2O=auto_peep_calculado
         )
 
         respuesta_final = {

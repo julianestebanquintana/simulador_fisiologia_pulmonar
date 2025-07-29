@@ -5,9 +5,8 @@ from .ventilador import Ventilador
 class InteraccionCorazonPulmon:
     """
     Módulo de interacción hemodinámica corazón-pulmón.
-
-    Modela el efecto de la presión en la vía aérea sobre el gasto cardíaco y la
-    entrega de oxígeno.
+    
+    Modela el efecto de la presión en la vía aérea sobre el gasto cardíaco.
     """
     def __init__(
         self,
@@ -39,8 +38,8 @@ class InteraccionCorazonPulmon:
 
     def _estimar_sao2(self, pao2: float) -> float:
         """
-        Estima la SaO2 a partir de la PaO2 usando una aproximación simple.
-        NOTA: Simplificación educativa que no implementa la curva de disociación
+        Estima la SaO2 a partir de la PaO2.
+        NOTA: Simplificación educativa; no implementa la curva de disociación
         de la hemoglobina (Ecuación de Hill).
         """
         if pao2 >= 100:
@@ -56,7 +55,8 @@ class InteraccionCorazonPulmon:
         self,
         resultados_mecanica: dict,
         resultados_gases: dict,
-        ventilador: Ventilador
+        ventilador: Ventilador,
+        auto_peep_cmH2O: float
     ) -> dict:
         """
         Calcula el impacto hemodinámico de la ventilación mecánica.
@@ -89,17 +89,31 @@ class InteraccionCorazonPulmon:
         tiempo_total_ciclo = t[-1] - t[-2-1] if len(t)>1 else t[-1]
         p_aw_ultimo_ciclo = P_aw[t >= t[-1] - tiempo_total_ciclo]
         t_ultimo_ciclo = t[t >= t[-1] - tiempo_total_ciclo]
-
         area_bajo_curva = np.trapezoid(p_aw_ultimo_ciclo, t_ultimo_ciclo)
         P_mean = area_bajo_curva / (t_ultimo_ciclo[-1] - t_ultimo_ciclo[0])
 
         # 2. Calcular Gasto Cardíaco Actual
         # GC_actual = GC_base - k * (P_mean - PEEP_base)
-        PEEP_base = ventilador.PEEP
-        delta_p = P_mean - PEEP_base
+        # PEEP_base = ventilador.PEEP
+        # delta_p = P_mean - PEEP_base
+        # reduccion_gc = self.k_sensibilidad * delta_p
+        # GC_actual = self.GC_base_L_min - reduccion_gc
+        # Asegurar que el GC no sea negativo
+        # GC_actual = max(0, GC_actual)
+        PEEP_aplicado = ventilador.PEEP
+        
+        # La presión efectiva que reduce el retorno venoso es la P_mean, pero al
+        # final de la espiración, es el PEEP total (aplicado + intrínseco).
+        # PEEP total para un cálculo más representativo del estrés diastólico.
+        PEEP_total = PEEP_aplicado + auto_peep_cmH2O
+        
+        # La reducción del GC depende del gradiente de presión por encima del
+        # PEEP base. Se asume que el Auto-PEEP tiene un efecto aditivo sobre 
+        # P_mean.
+        delta_p = (P_mean - PEEP_aplicado) + auto_peep_cmH2O
+        
         reduccion_gc = self.k_sensibilidad * delta_p
         GC_actual = self.GC_base_L_min - reduccion_gc
-        # Asegurar que el GC no sea negativo
         GC_actual = max(0, GC_actual)
 
         # 3. Calcular Contenido Arterial de O2 (CAO2)
@@ -118,6 +132,8 @@ class InteraccionCorazonPulmon:
 
         return {
             'P_mean_cmH2O': P_mean,
+            'auto_peep_cmH2O': auto_peep_cmH2O,
+            'PEEP_total_cmH2O': PEEP_total,
             'GC_actual_L_min': GC_actual,
             'PaO2_mmHg': PaO2,
             'SaO2_percent': SaO2 * 100,

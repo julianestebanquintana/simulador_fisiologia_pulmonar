@@ -1,5 +1,3 @@
-# backend/models/paciente.py
-
 class Paciente:
     """Clase que define un paciente con parámetros normales;
     para agregar pacientes con patologías, crear una subclase con modificaciones
