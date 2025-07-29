@@ -1,6 +1,7 @@
 # Librerías
 import numpy as np
 from scipy.integrate import solve_ivp
+import math
 from .paciente import Paciente
 from .ventilador import Ventilador
 from .control import ControlRespiratorio
@@ -17,7 +18,7 @@ class Simulador:
         if ventilador.modo == 'ESP':
             assert self.control is not None, "Se requiere un módulo de ControlRespiratorio para el modo 'ESP'"
 
-    def _modelo_edo(self, t, y):
+    def _modelo_edo(self, t, y, P_aw_func, R1, E1, R2, E2):
         V1, V2 = y
 
         if self.ventilador.modo == 'ESP':
@@ -43,30 +44,54 @@ class Simulador:
 
         return [dV1_dt, dV2_dt]
 
-    def simular(self,
-                num_ciclos: int=15,
-                pasos_por_ciclo: int = 100):
-        """Ejecuta múltiples ciclos y devuelve t, V1 y V2 concatenados."""
+    def simular(self, 
+        tiempo_total_deseado: float = 15.0, 
+        pasos_por_ciclo: int = 200
+        )-> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """ Ejecuta la simulación para múltiples ciclos respiratorios hasta alcanzar
+        una duración total deseada. Devuelve t, V1 y V2 concatenados."""
+        
+        # 1. CALCULAR DINÁMICAMENTE EL NÚMERO DE CICLOS 
+        tiempo_por_ciclo = 60.0 / self.ventilador.fr
+        if tiempo_por_ciclo <= 0:
+            raise ValueError("La frecuencia respiratoria debe ser mayor que cero.")
+        # Añadimos 2 ciclos de margen
+        num_ciclos = math.ceil(tiempo_total_deseado / tiempo_por_ciclo) + 2
+
+        # 2. Ciclo FOR para calcular múltiples ciclos respiratorios
         t_data, V1_data, V2_data = [], [], []
         V0 = [0.0, 0.0]
+        P_aw_func = self.ventilador.presion # Se obtiene la función de presión para PCV
+        
         for i in range(num_ciclos):
-            t0 = i * self.ventilador.T_total
-            t1 = (i + 1) * self.ventilador.T_total
-            if i < num_ciclos-1: #corrección para evitar discontinuidad en t=3.0
-                t_eval = np.linspace(t0, t1, pasos_por_ciclo, endpoint=False)
-            else:
-                t_eval = np.linspace(t0, t1, pasos_por_ciclo, endpoint=True)
-            sol = solve_ivp(self._modelo_edo,
-                            [t0, t1],
-                            V0,
-                            t_eval=t_eval)
+            t0 = i * tiempo_por_ciclo
+            t1 = (i + 1) * tiempo_por_ciclo
+
+            # Corrección para evitar puntos de tiempo duplicados
+            endpoint = (i == num_ciclos - 1)
+            t_eval = np.linspace(t0, t1, pasos_por_ciclo, endpoint=endpoint)
+
+            sol = solve_ivp(
+                fun=self._modelo_edo,
+                t_span=[t0, t1],
+                y0=V0,
+                method='RK45',
+                t_eval=t_eval,
+                args=(P_aw_func, self.paciente.R1, self.paciente.E1, 
+                      self.paciente.R2, self.paciente.E2)
+            )
+            
             t_data.append(sol.t)
             V1_data.append(sol.y[0])
             V2_data.append(sol.y[1])
+            
+            # Propagar el estado final como condición inicial del siguiente ciclo
             V0 = sol.y[:, -1]
+
         t = np.concatenate(t_data)
         V1 = np.concatenate(V1_data)
         V2 = np.concatenate(V2_data)
+        
         return t, V1, V2
 
     def procesar_resultados(self,

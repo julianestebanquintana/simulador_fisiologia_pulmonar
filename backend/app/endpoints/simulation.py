@@ -48,7 +48,8 @@ async def run_simulation(request: SimulationRequest):
         paciente = Paciente(**request.paciente.model_dump())
         ventilador = Ventilador(**request.ventilador.model_dump())
         simulador = Simulador(paciente, ventilador)
-        t, v1, v2 = simulador.simular(num_ciclos=10)
+        # t, v1, v2 = simulador.simular(num_ciclos=10)
+        t, v1, v2 = simulador.simular(tiempo_total_deseado=15.0)
         resultados_mecanica = simulador.procesar_resultados(t, v1, v2)
 
         intercambio_gases = IntercambioGases(
