@@ -19,7 +19,7 @@ app = FastAPI(
 
 # --- Orígenes permitidos ---
 origins = [
-    "http://localhost:3000", # El origen de tu frontend en desarrollo
+    "http://localhost:3000",  # El origen de tu frontend en desarrollo
     # Podrías añadir aquí el dominio de producción en el futuro
 ]
 
@@ -28,9 +28,10 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"], # Permite todos los métodos (GET, POST, etc.)
-    allow_headers=["*"], # Permite todas las cabeceras
+    allow_methods=["*"],  # Permite todos los métodos (GET, POST, etc.)
+    allow_headers=["*"],  # Permite todas las cabeceras
 )
+
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):

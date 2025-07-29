@@ -59,13 +59,13 @@ async def run_simulation(request: SimulationRequest):
 
         hemodinamica = InteraccionCorazonPulmon()
         # Extraer el auto_peep calculado por el módulo mecánico
-        auto_peep_calculado = resultados_mecanica.get('auto_peep', 0.0)
+        auto_peep_calculado = resultados_mecanica.get("auto_peep", 0.0)
 
         resultados_hemo = hemodinamica.calcular(
-            resultados_mecanica, 
-            resultados_gases, 
+            resultados_mecanica,
+            resultados_gases,
             ventilador,
-            auto_peep_cmH2O=auto_peep_calculado
+            auto_peep_cmH2O=auto_peep_calculado,
         )
 
         respuesta_final = {
