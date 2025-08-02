@@ -1,7 +1,8 @@
 import React from 'react';
+import { Form } from 'react-bootstrap';
 import { useSimulation } from '../context/SimulationContext';
 
-const ParameterSlider = ({ label, value, min, max, step, unit, onChange, name }) => (
+const ParameterSlider = ({ label, value, min, max, step, unit, onChange, name, disabled = false }) => (
   <div className="mb-3">
     <label htmlFor={label} className="form-label">
       {label}: <span className="fw-bold">{value}</span> {unit}
@@ -16,13 +17,22 @@ const ParameterSlider = ({ label, value, min, max, step, unit, onChange, name })
       step={step}
       value={value}
       onChange={onChange}
+      disabled={disabled} // <-- Se añade la propiedad 'disabled'
     />
   </div>
 );
 
 function ParameterForm() {
   const { simulationState, updateParameters, runSimulation } = useSimulation();
-  
+  const { patient, ventilator } = simulationState;
+  const isSpontaneous = ventilator.modo === 'ESPONTANEO';
+
+  const handleModeChange = (e) => {
+    const newMode = e.target.checked ? 'ESPONTANEO' : 'PCV';
+    updateParameters({
+      ventilator: { ...ventilator, modo: newMode },
+    });
+  };
   const handlePatientChange = (e) => {
     updateParameters({
       patient: {
@@ -45,30 +55,41 @@ function ParameterForm() {
     <div className="control-panel">
       <div className="control-panel__sliders">
         <h5 className="mt-3">Parámetros del Paciente</h5>
-        <ParameterSlider label="Resistencia 1 (R1)" name="R1" value={simulationState.patient.R1} min="5" max="50" step="1" unit="cmH2O/L/s" onChange={handlePatientChange} />
-        <ParameterSlider label="Compliancia 1 (C1)" name="C1" value={simulationState.patient.C1} min="0.01" max="0.1" step="0.005" unit="L/cmH2O" onChange={handlePatientChange} />
-        <ParameterSlider label="Resistencia 2 (R2)" name="R2" value={simulationState.patient.R2} min="5" max="50" step="1" unit="cmH2O/L/s" onChange={handlePatientChange} />
-        <ParameterSlider label="Compliancia 2 (C2)" name="C2" value={simulationState.patient.C2} min="0.01" max="0.1" step="0.005" unit="L/cmH2O" onChange={handlePatientChange} />
-        <h5 className="mt-4">Parámetros del Ventilador</h5>
-        <div className="mb-3">
-          <label htmlFor="vent-mode" className="form-label">Modo Ventilatorio</label>
-          <select className="form-select" id="vent-mode" name="modo" value={simulationState.ventilator.modo} onChange={handleVentilatorChange}>
-            <option value="PCV">Controlado por Presión (PCV)</option>
-            <option value="VCV">Controlado por Volumen (VCV)</option>
-          </select>
-        </div>
+        <ParameterSlider label="Resistencia 1 (R1)" name="R1" value={patient.R1} min="5" max="50" step="1" unit="cmH2O/L/s" onChange={handlePatientChange} />
+        <ParameterSlider label="Compliancia 1 (C1)" name="C1" value={patient.C1} min="0.01" max="0.1" step="0.005" unit="L/cmH2O" onChange={handlePatientChange} />
+        <ParameterSlider label="Resistencia 2 (R2)" name="R2" value={patient.R2} min="5" max="50" step="1" unit="cmH2O/L/s" onChange={handlePatientChange} />
+        <ParameterSlider label="Compliancia 2 (C2)" name="C2" value={patient.C2} min="0.01" max="0.1" step="0.005" unit="L/cmH2O" onChange={handlePatientChange} />
+        
+        <h5 className="mt-4">Modo de Ventilación</h5>
+        <Form.Group className="mb-3">
+          {['PCV', 'VCV', 'ESPONTANEO'].map((mode) => (
+            <Form.Check
+              key={mode}
+              inline
+              type="radio"
+              id={`mode-${mode}`}
+              name="modo"
+              label={mode}
+              value={mode}
+              checked={ventilator.modo === mode}
+              onChange={handleVentilatorChange}
+            />
+          ))}
+        </Form.Group>
 
-        {/* Condicional que cambia según el modo ventilatorio*/}
-        {simulationState.ventilator.modo === 'PCV' ? (
-          <ParameterSlider label="Presión de Conducción" name="P_driving" value={simulationState.ventilator.P_driving} min="5" max="35" step="1" unit="cmH2O" onChange={handleVentilatorChange} />
-        ) : (
-          <ParameterSlider label="Volumen Tidal" name="Vt" value={simulationState.ventilator.Vt} min="0.1" max="1.0" step="0.05" unit="L" onChange={handleVentilatorChange} />
+        <h5 className="mt-4">Parámetros del Ventilador</h5>
+        
+        {ventilator.modo === 'PCV' && (
+          <ParameterSlider label="Presión de Conducción" name="P_driving" value={ventilator.P_driving} min="5" max="35" step="1" unit="cmH2O" onChange={handleVentilatorChange} disabled={isSpontaneous} />
         )}
 
-        <ParameterSlider label="PEEP" name="PEEP" value={simulationState.ventilator.PEEP} min="0" max="25" step="1" unit="cmH2O" onChange={handleVentilatorChange} />
-        <ParameterSlider label="Frecuencia Respiratoria" name="fr" value={simulationState.ventilator.fr} min="8" max="40" step="1" unit="rpm" onChange={handleVentilatorChange} />
-        <ParameterSlider label="FiO₂" name="FiO2" value={simulationState.ventilator.FiO2} min="0.21" max="1.0" step="0.01" unit="" onChange={handleVentilatorChange} />
-      
+        {ventilator.modo === 'VCV' && (
+          <ParameterSlider label="Volumen Tidal" name="Vt" value={ventilator.Vt} min="0.1" max="1.0" step="0.05" unit="L" onChange={handleVentilatorChange} disabled={isSpontaneous} />
+        )}
+        
+        <ParameterSlider label="PEEP" name="PEEP" value={ventilator.PEEP} min="0" max="25" step="1" unit="cmH2O" onChange={handleVentilatorChange} disabled={isSpontaneous} />
+        <ParameterSlider label="Frecuencia Respiratoria" name="fr" value={ventilator.fr} min="8" max="40" step="1" unit="rpm" onChange={handleVentilatorChange} disabled={isSpontaneous} />
+        <ParameterSlider label="FiO₂" name="FiO2" value={ventilator.FiO2} min="0.21" max="1.0" step="0.01" unit="" onChange={handleVentilatorChange} />
       </div>
 
       <div className="d-grid mt-auto pt-3 border-top">

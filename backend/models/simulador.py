@@ -21,9 +21,9 @@ class Simulador:
     def _modelo_edo(self, t, y, P_aw_func, R1, E1, R2, E2):
         V1, V2 = y
 
-        if self.ventilador.modo == 'ESP':
+        if self.ventilador.modo == 'ESPONTANEO':
             # En modo espontáneo, la presión la genera el módulo de control
-            P_aw = self.control.generar_Pmus(t)
+            P_aw = P_aw_func(t)
         elif self.ventilador.modo == 'VCV':
             # Lógica para VCV
             en_insp = (t % self.ventilador.T_total) < self.ventilador.Ti
@@ -136,6 +136,64 @@ class Simulador:
             'P_aw': P_aw,
             'auto_peep': auto_peep_calculado
         }
+
+    def simular_espontaneo(self,
+                           iteraciones: int = 30,
+                           pasos_por_ciclo: int = 100
+                           ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Ejecuta una simulación en lazo cerrado para el modo espontáneo.
+        """
+        if not self.control:
+            raise ValueError("El módulo de control es necesario para el modo espontáneo.")
+
+        t_data, V1_data, V2_data = [], [], []
+        V0 = [0.0, 0.0]
+        # Condición inicial para la primera iteración del controlador
+        paco2_actual = 55.0  # Empezamos con hipercapnia para forzar una respuesta
+
+        for i in range(iteraciones):
+            # 1. El controlador ajusta el impulso ventilatorio basado en el CO2
+            dt = 60.0 / self.ventilador.fr  # Duración del último ciclo
+            amplitud, frec_hz = self.control.actualizar(paco2_actual, dt)
+            
+            # Actualizamos los parámetros del ventilador para el ciclo actual
+            self.ventilador.fr = frec_hz * 60.0
+            tiempo_ciclo = 60.0 / self.ventilador.fr
+            
+            # 2. Simulamos UN ciclo con el nuevo impulso ventilatorio
+            t0 = i * tiempo_ciclo
+            t1 = (i + 1) * tiempo_ciclo
+            t_eval = np.linspace(t0, t1, pasos_por_ciclo)
+
+            # La función de presión ahora es la Pmus generada por el control
+            p_mus_func = self.control.generar_Pmus
+
+            sol = solve_ivp(
+                fun=self._modelo_edo,
+                t_span=[t0, t1], 
+                y0=V0, 
+                method='RK45', 
+                t_eval=t_eval,
+                args=(p_mus_func, self.paciente.R1, self.paciente.E1, 
+                    self.paciente.R2, self.paciente.E2)
+            )
+
+            # 3. Procesamos el resultado para obtener el nuevo CO2
+            resultados_ciclo = self.procesar_resultados(sol.t, sol.y[0], sol.y[1])
+            intercambio = IntercambioGases(ventilador=self.ventilador, V_D=0.15, VCO2=200, R=0.8, FiO2=0.21, Pb=560)
+            resultados_gases = intercambio.calcular(resultados_ciclo)
+            paco2_actual = resultados_gases['PACO2_mmHg']
+
+            # 4. Guardamos y propagamos el estado para el siguiente ciclo
+            t_data.append(sol.t)
+            V1_data.append(sol.y[0])
+            V2_data.append(sol.y[1])
+            V0 = sol.y[:, -1]
+
+        return (np.concatenate(t_data),
+                np.concatenate(V1_data),
+                np.concatenate(V2_data))
 
     # def graficar_resultados(self,
     #                         resultados: dict,

@@ -10,6 +10,7 @@ from models.ventilador import Ventilador
 from models.simulador import Simulador
 from models.intercambio import IntercambioGases
 from models.hemodinamica import InteraccionCorazonPulmon
+from models.control import ControlRespiratorio
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="", tags=["Simulación"])
@@ -24,7 +25,8 @@ class PacienteParams(BaseModel):
 
 
 class VentiladorParams(BaseModel):
-    modo: str = Field("PCV", description="Modo ventilatorio (PCV o VCV)")
+    # modo: str = Field("PCV", description="Modo ventilatorio (PCV o VCV)")
+    modo: str = Field("PCV", description="Modo ventilatorio (PCV, VCV o ESPONTANEO)")
     PEEP: float = Field(5.0, ge=0, description="PEEP (cmH2O)")
     P_driving: float = Field(15.0, ge=0, description="Presión de conducción (cmH2O)")
     fr: float = Field(15.0, gt=0, description="Frecuencia respiratoria (rpm)")
@@ -47,7 +49,14 @@ async def run_simulation(request: SimulationRequest):
     try:
         paciente = Paciente(**request.paciente.model_dump())
         ventilador = Ventilador(**request.ventilador.model_dump())
-        simulador = Simulador(paciente, ventilador)
+        if ventilador.modo == "ESPONTANEO":
+            control = ControlRespiratorio()
+            simulador = Simulador(paciente, ventilador, control)
+            t, v1, v2 = simulador.simular_espontaneo()
+        else:
+            simulador = Simulador(paciente, ventilador)
+            t, v1, v2 = simulador.simular(tiempo_total_deseado=15.0)
+        # simulador = Simulador(paciente, ventilador)
         # t, v1, v2 = simulador.simular(num_ciclos=10)
         t, v1, v2 = simulador.simular(tiempo_total_deseado=15.0)
         resultados_mecanica = simulador.procesar_resultados(t, v1, v2)
