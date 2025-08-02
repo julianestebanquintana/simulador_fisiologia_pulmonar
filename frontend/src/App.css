@@ -3,6 +3,7 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Prevenir scroll en el contenedor principal */
 }
 
 /* Permitimos que la sección principal crezca para llenar el espacio */
@@ -10,6 +11,7 @@
   flex-grow: 1;
   /* Importante para que los hijos con altura flexible funcionen */
   min-height: 0;
+  overflow: hidden; /* Prevenir scroll horizontal */
 }
 
 /* Contenedor de la columna de visualización */
@@ -17,6 +19,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: hidden; /* Prevenir desbordamiento */
 }
 
 /* Contenedor específico para cada gráfico */
@@ -32,9 +35,32 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  max-height: 100vh; /* Limitar altura máxima */
+  overflow: hidden; /* Prevenir desbordamiento */
 }
 
 .control-panel__sliders {
   overflow-y: auto; /* Habilita el scroll vertical si es necesario */
   flex-grow: 1;
+  padding-right: 10px; /* Espacio para la barra de scroll */
+}
+
+/* Asegurar que el botón de simulación siempre esté visible */
+.control-panel__button {
+  flex-shrink: 0; /* No permitir que se encoja */
+  margin-top: auto; /* Empujar hacia abajo */
+}
+
+/* Estilos para el sidebar */
+.sidebar {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
 }

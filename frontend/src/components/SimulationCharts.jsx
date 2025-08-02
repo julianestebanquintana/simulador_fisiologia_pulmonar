@@ -39,7 +39,7 @@ const baseChartOptions = {
 };
 
 // Componente para un único gráfico
-function SingleChart({ title, yLabel, data, borderColor, backgroundColor, yMin }) {
+function SingleChart({ title, yLabel, data, borderColor, backgroundColor, yMin, yMax }) {
   const chartData = {
     labels: data.labels,
     datasets: [{
@@ -56,11 +56,11 @@ function SingleChart({ title, yLabel, data, borderColor, backgroundColor, yMin }
     ...baseChartOptions,
     plugins: {
       legend: {
-        display: false, // No necesitamos una leyenda para un solo set de datos
+        display: false,
       },
       title: {
         display: true,
-        text: title, // Usamos el título que pasamos como prop
+        text: title,
       },
     },
     scales: {
@@ -74,7 +74,22 @@ function SingleChart({ title, yLabel, data, borderColor, backgroundColor, yMin }
       },
       y: {
         title: { display: true, text: yLabel },
-        suggestedMin: yMin,
+        min: yMin,
+        max: yMax,
+        grid: {
+          color: function(context) {
+            if (context.tick.value === 0) {
+              return 'rgba(0, 0, 0, 0.3)'; // Línea del 0 más visible
+            }
+            return 'rgba(0, 0, 0, 0.1)'; // Otras líneas de cuadrícula
+          },
+          lineWidth: function(context) {
+            if (context.tick.value === 0) {
+              return 2; // Línea del 0 más gruesa
+            }
+            return 1;
+          }
+        },
       },
     },
   };
@@ -106,8 +121,11 @@ function SimulationCharts() {
   }
 
   const timeArray = results.series_tiempo.tiempo;
+  const pressureValues = results.series_tiempo.presion_via_aerea;
+  const flowValues = results.series_tiempo.flujo_total;
+  const volumeValues = results.series_tiempo.volumen_total;
 
-  // Encontramos cuántos puntos de datos caben en nuestra ventana de 15 segundos
+  // Encontramos cuántos puntos de datos caben en nuestra ventana de 30 segundos
   let pointsToShow = timeArray.length;
   for (let i = 0; i < timeArray.length; i++) {
     if (timeArray[i] > SIMULATION_WINDOW_SECONDS) {
@@ -118,13 +136,13 @@ function SimulationCharts() {
 
   // Recortamos todos los arrays al mismo tamaño
   const labels = timeArray.slice(0, pointsToShow).map(t => t.toFixed(2));
-  const pressureValues = results.series_tiempo.presion_via_aerea.slice(0, pointsToShow);
-  const flowValues = results.series_tiempo.flujo_total.slice(0, pointsToShow);
-  const volumeValues = results.series_tiempo.volumen_total.slice(0, pointsToShow);
+  const pressureValuesSliced = pressureValues.slice(0, pointsToShow);
+  const flowValuesSliced = flowValues.slice(0, pointsToShow);
+  const volumeValuesSliced = volumeValues.slice(0, pointsToShow);
 
-  const pressureData = { labels, values: pressureValues };
-  const flowData = { labels, values: flowValues };
-  const volumeData = { labels, values: volumeValues };
+  const pressureData = { labels, values: pressureValuesSliced };
+  const flowData = { labels, values: flowValuesSliced };
+  const volumeData = { labels, values: volumeValuesSliced };
 
   return (
     // Contenedor principal
@@ -136,7 +154,8 @@ function SimulationCharts() {
           data={pressureData} 
           borderColor="rgb(255, 99, 132)" 
           backgroundColor="rgba(255, 99, 132, 0.5)" 
-          yMin={-5} />
+          yMin={-5}
+          yMax={35} />
       </div>
       <div className="chart-wrapper mt-3">
         <SingleChart 
@@ -144,7 +163,10 @@ function SimulationCharts() {
           yLabel="Flujo (L/s)" 
           data={flowData} 
           borderColor="rgb(54, 162, 235)" 
-          backgroundColor="rgba(54, 162, 235, 0.5)" />
+          backgroundColor="rgba(54, 162, 235, 0.5)"
+          yMin={-2} 
+          yMax={5}  
+        />
       </div>
       <div className="chart-wrapper mt-3">
         <SingleChart 
@@ -152,7 +174,10 @@ function SimulationCharts() {
           yLabel="Volumen (L)" 
           data={volumeData} 
           borderColor="rgb(75, 192, 192)" 
-          backgroundColor="rgba(75, 192, 192, 0.5)" />
+          backgroundColor="rgba(75, 192, 192, 0.5)"
+          yMin={0}
+          yMax={5}
+        />
       </div>
     </div>
   );

@@ -14,8 +14,8 @@ function App() {
 
       <main className="row main-content">
         {/* Columna Izquierda: Panel de Control */}
-        <aside className="col-md-4 border-end d-flex flex-column">
-          <div className="p-3" style={{ overflowY: 'auto' }}>
+        <aside className="col-md-4 border-end sidebar">
+          <div className="sidebar-content">
             <ParameterForm />
           </div>
         </aside>
@@ -39,7 +39,7 @@ function App() {
     </main>
 
       <footer className="mt-auto pt-3 text-center text-muted border-top">
-        <small>Proyecto de Grado - Maestría en Ingeniería Biomédica</small>
+        <small>Julián Esteban Quintana. Medellín, Colombia. 2025.</small>
       </footer>
     </div>
   );

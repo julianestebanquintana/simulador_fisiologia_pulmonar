@@ -49,16 +49,16 @@ async def run_simulation(request: SimulationRequest):
     try:
         paciente = Paciente(**request.paciente.model_dump())
         ventilador = Ventilador(**request.ventilador.model_dump())
+        
         if ventilador.modo == "ESPONTANEO":
             control = ControlRespiratorio()
             simulador = Simulador(paciente, ventilador, control)
             t, v1, v2 = simulador.simular_espontaneo()
         else:
             simulador = Simulador(paciente, ventilador)
-            t, v1, v2 = simulador.simular(tiempo_total_deseado=15.0)
-        # simulador = Simulador(paciente, ventilador)
-        # t, v1, v2 = simulador.simular(num_ciclos=10)
-        t, v1, v2 = simulador.simular(tiempo_total_deseado=15.0)
+            # Cambiar a 30 segundos para coincidir con el frontend
+            t, v1, v2 = simulador.simular(tiempo_total_deseado=30.0)
+        
         resultados_mecanica = simulador.procesar_resultados(t, v1, v2)
 
         intercambio_gases = IntercambioGases(

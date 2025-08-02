@@ -92,7 +92,7 @@ function ParameterForm() {
         <ParameterSlider label="FiO₂" name="FiO2" value={ventilator.FiO2} min="0.21" max="1.0" step="0.01" unit="" onChange={handleVentilatorChange} />
       </div>
 
-      <div className="d-grid mt-auto pt-3 border-top">
+      <div className="control-panel__button d-grid mt-auto pt-3 border-top">
         <button className="btn btn-primary btn-lg" onClick={runSimulation} disabled={simulationState.isLoading}>
           {simulationState.isLoading ? 'Simulando...' : 'Ejecutar Simulación'}
         </button>

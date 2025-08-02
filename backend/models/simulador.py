@@ -5,6 +5,7 @@ import math
 from .paciente import Paciente
 from .ventilador import Ventilador
 from .control import ControlRespiratorio
+from .intercambio import IntercambioGases  # Agregar este import
 
 class Simulador:
     """Orquesta la simulación paciente-ventilador."""
@@ -15,8 +16,8 @@ class Simulador:
         self.paciente = paciente
         self.ventilador = ventilador
         self.control = control
-        if ventilador.modo == 'ESP':
-            assert self.control is not None, "Se requiere un módulo de ControlRespiratorio para el modo 'ESP'"
+        if ventilador.modo == 'ESPONTANEO':
+            assert self.control is not None, "Se requiere un módulo de ControlRespiratorio para el modo 'ESPONTANEO'"
 
     def _modelo_edo(self, t, y, P_aw_func, R1, E1, R2, E2):
         V1, V2 = y
