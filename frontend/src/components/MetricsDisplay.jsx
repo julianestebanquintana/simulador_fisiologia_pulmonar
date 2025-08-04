@@ -15,7 +15,7 @@ function MetricsDisplay() {
   const { simulationState } = useSimulation();
   const { results } = simulationState;
 
-  if (!results) return null; // No mostrar nada si no hay resultados
+  if (!results) return null; // No mostrar nada si no hay resultados de la simulación
   const autoPeepValue = results.metricas_mecanicas.auto_peep || 0;
 
   return (

@@ -1,4 +1,3 @@
-# Librerías
 import numpy as np
 from scipy.integrate import solve_ivp
 import math

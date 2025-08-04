@@ -1,4 +1,3 @@
-# Librerías
 import numpy as np
 from .ventilador import Ventilador
 

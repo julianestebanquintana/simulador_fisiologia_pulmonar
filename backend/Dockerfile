@@ -1,12 +1,10 @@
-# backend/Dockerfile
-
 # Imagen base
 FROM python:3.11-slim
 
 # Establecer directorio de trabajo
 WORKDIR /app
 
-# AÑADE ESTA LÍNEA: Le dice a Python dónde buscar módulos
+# Le dice a Python dónde buscar módulos
 ENV PYTHONPATH=/app
 
 # Copiar archivos de requerimientos si existen

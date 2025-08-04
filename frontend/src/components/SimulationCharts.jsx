@@ -125,7 +125,7 @@ function SimulationCharts() {
   const flowValues = results.series_tiempo.flujo_total;
   const volumeValues = results.series_tiempo.volumen_total;
 
-  // Encontramos cuántos puntos de datos caben en nuestra ventana de 30 segundos
+  // Cuántos puntos de datos caben en una ventana de 30 segundos
   let pointsToShow = timeArray.length;
   for (let i = 0; i < timeArray.length; i++) {
     if (timeArray[i] > SIMULATION_WINDOW_SECONDS) {
@@ -134,7 +134,7 @@ function SimulationCharts() {
     }
   }
 
-  // Recortamos todos los arrays al mismo tamaño
+  // Recortar todos los arrays al mismo tamaño
   const labels = timeArray.slice(0, pointsToShow).map(t => t.toFixed(2));
   const pressureValuesSliced = pressureValues.slice(0, pointsToShow);
   const flowValuesSliced = flowValues.slice(0, pointsToShow);
