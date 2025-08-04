@@ -17,7 +17,7 @@ const ParameterSlider = ({ label, value, min, max, step, unit, onChange, name, d
       step={step}
       value={value}
       onChange={onChange}
-      disabled={disabled} // <-- Se añade la propiedad 'disabled'
+      disabled={disabled}
     />
   </div>
 );
@@ -27,12 +27,6 @@ function ParameterForm() {
   const { patient, ventilator } = simulationState;
   const isSpontaneous = ventilator.modo === 'ESPONTANEO';
 
-  const handleModeChange = (e) => {
-    const newMode = e.target.checked ? 'ESPONTANEO' : 'PCV';
-    updateParameters({
-      ventilator: { ...ventilator, modo: newMode },
-    });
-  };
   const handlePatientChange = (e) => {
     updateParameters({
       patient: {
@@ -51,6 +45,13 @@ function ParameterForm() {
     });
   };
 
+  // Opciones para el menú desplegable de modos ventilatorios
+  const ventilationModes = [
+    { value: 'PCV', label: 'PCV - Presión Controlada' },
+    { value: 'VCV', label: 'VCV - Volumen Controlado' },
+    { value: 'ESPONTANEO', label: 'Espontáneo' }
+  ];
+
   return (
     <div className="control-panel">
       <div className="control-panel__sliders">
@@ -62,19 +63,18 @@ function ParameterForm() {
         
         <h5 className="mt-4">Modo de Ventilación</h5>
         <Form.Group className="mb-3">
-          {['PCV', 'VCV', 'ESPONTANEO'].map((mode) => (
-            <Form.Check
-              key={mode}
-              inline
-              type="radio"
-              id={`mode-${mode}`}
-              name="modo"
-              label={mode}
-              value={mode}
-              checked={ventilator.modo === mode}
-              onChange={handleVentilatorChange}
-            />
-          ))}
+          <Form.Select
+            name="modo"
+            value={ventilator.modo}
+            onChange={handleVentilatorChange}
+            aria-label="Seleccionar modo de ventilación"
+          >
+            {ventilationModes.map((mode) => (
+              <option key={mode.value} value={mode.value}>
+                {mode.label}
+              </option>
+            ))}
+          </Form.Select>
         </Form.Group>
 
         <h5 className="mt-4">Parámetros del Ventilador</h5>
