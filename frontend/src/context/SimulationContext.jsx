@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext } from 'react';
 
 const SimulationContext = createContext();
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 // Estado inicial con todos los parámetros
 const initialState = {
@@ -39,7 +40,7 @@ export function SimulationProvider({ children }) {
 
       console.log("Enviando payload al backend:", payload);
 
-      const response = await fetch('http://localhost:8000/simulate', {
+      const response = await fetch(`${API_BASE_URL}/simulate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
