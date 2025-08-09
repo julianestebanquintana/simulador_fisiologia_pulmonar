@@ -22,9 +22,9 @@ origins = [
     # Origen para el desarrollo local
     "http://localhost:3000",
     
-    # Orígenes para producción (pendiente DOMINIO)
-    #"http://tu-dominio.com",
-    #"https://tu-dominio.com",
+    # Orígenes para producción
+    "http://fisiologiapulmonar.com",
+    "https://fisiologiapulmonar.com",
 ]
 
 # --- Middleware a la aplicación
