@@ -14,13 +14,17 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Simulador de Fisiología Pulmonar API",
     description="API para ejecutar simulaciones de fisiología pulmonar.",
-    version="0.1.0",
+    version="1.0.0",
 )
 
 # --- Orígenes permitidos ---
 origins = [
-    "http://localhost:3000",  # El origen de tu frontend en desarrollo
-    # Podrías añadir aquí el dominio de producción en el futuro
+    # Origen para el desarrollo local
+    "http://localhost:3000",
+    
+    # Orígenes para producción (pendiente DOMINIO)
+    #"http://tu-dominio.com",
+    #"https://tu-dominio.com",
 ]
 
 # --- Middleware a la aplicación
@@ -43,4 +47,4 @@ async def log_requests(request: Request, call_next):
 
 
 # --- Incluir Routers ---
-app.include_router(simulation.router)
+app.include_router(simulation.router, prefix="/api")
