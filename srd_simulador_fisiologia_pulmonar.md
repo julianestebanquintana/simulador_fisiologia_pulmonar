@@ -7,7 +7,7 @@
 ---
 
 ## 1. Propósito
-Este documento define de manera clara y detallada los requisitos funcionales y no funcionales para la implementación del simulador de fisiología pulmonar. Sirve como guía para el equipo de desarrollo, estableciendo qué se va a construir, con qué tecnologías y bajo qué criterios de calidad. El documento incluye las modificaciones identificadas en la evaluación de usabilidad y calidad educativa del prototipo inicial.
+Este documento define de manera clara y detallada los requisitos funcionales y no funcionales para la implementación del simulador de fisiología pulmonar. Sirve como guía para el desarrollo, estableciendo qué se va a construir, con qué tecnologías y bajo qué criterios de calidad. El documento incluye las modificaciones identificadas en la evaluación de usabilidad y calidad educativa del prototipo inicial.
 
 ## 2. Alcance
 - **Versión 1.0 (MVP)**: Integrar las clases de Python ya desarrolladas para la simulación con una interfaz gráfica web básica, desplegada en un VPS Linux. Debe ser funcional y presentable.
@@ -64,21 +64,22 @@ El simulador constará de:
 | FR18 | Implementar diseño responsive para dispositivos móviles. |
 | FR19 | Asegurar cumplimiento de estándares básicos de accesibilidad (WCAG AA). |
 | FR20 | Integrar CDN (Cloudflare) para mejorar rendimiento y seguridad. |
+| FR21 | Preparar arquitectura del código para compatibilidad futura con estándar LTI 1.3. |
 
 ### 6.3 Versión 3.0 - Plataforma Educativa Completa
 | ID   | Descripción                                                          |
 |------|----------------------------------------------------------------------|
-| FR21 | Sistema de autenticación diferenciado entre estudiantes e instructores. |
-| FR22 | Experiencias adaptativas que ajusten complejidad según nivel del usuario. |
-| FR23 | Plataforma de creación y gestión de escenarios clínicos por docentes. |
-| FR24 | Sistema formal de evaluación de competencias con reportes descargables. |
-| FR25 | Implementación de repetición espaciada con notificaciones automáticas. |
-| FR26 | Recolección y análisis de datos de uso anónimos para mejora continua. |
-| FR27 | Integración de currículo de fisiología pulmonar con videos y contenido multimedia. |
-| FR28 | Ejercicios y exámenes cortos intercalados en el aprendizaje. |
-| FR29 | Implementación de modelo mecánico no lineal con viscoelasticidad e inercia. |
-| FR30 | Interacción con otros sistemas fisiológicos (cardiovascular, renal). |
-| FR31 | Incorporación de nuevos modos ventilatorios modernos (auto-flujo, presión soporte, etc.). |
+| FR23 | Sistema de autenticación diferenciado entre estudiantes e instructores. |
+| FR24 | Experiencias adaptativas que ajusten complejidad según nivel del usuario. |
+| FR25 | Plataforma de creación y gestión de escenarios clínicos por docentes. |
+| FR26 | Sistema formal de evaluación de competencias con reportes descargables. |
+| FR27 | Implementación de repetición espaciada con notificaciones automáticas. |
+| FR28 | Recolección y análisis de datos de uso anónimos para mejora continua. |
+| FR29 | Integración de currículo de fisiología pulmonar con videos y contenido multimedia. |
+| FR30 | Ejercicios y exámenes cortos intercalados en el aprendizaje. |
+| FR31 | Implementación de modelo mecánico no lineal con viscoelasticidad e inercia. |
+| FR32 | Interacción con otros sistemas fisiológicos (cardiovascular, renal). |
+| FR33 | Incorporación de nuevos modos ventilatorios modernos (auto-flujo, presión soporte, etc.). |
 
 ## 7. Requisitos No Funcionales
 
@@ -95,13 +96,14 @@ El simulador constará de:
 - **NFR8 (Rendimiento Móvil)**: Tiempo de carga < 3s en dispositivos móviles con conexión 3G.
 - **NFR9 (Seguridad CDN)**: Protección contra DDoS y tráfico malicioso mediante Cloudflare.
 - **NFR10 (Retroalimentación)**: Respuesta visual inmediata (< 500ms) para todas las interacciones del usuario.
+- **NFR11 (Arquitectura LTI)**: Estructura de código preparada para futura integración LTI 1.3 sin refactoring mayor.
 
 ### 7.3 Versión 3.0
-- **NFR11 (Accesibilidad)**: Cumplimiento completo de estándares WCAG AA para dispositivos móviles y de escritorio.
-- **NFR12 (Persistencia)**: Base de datos con tiempo de respuesta < 100ms para consultas de usuario.
-- **NFR13 (Analítica)**: Procesamiento de datos de uso en tiempo real con latencia < 5s.
-- **NFR14 (Seguridad Avanzada)**: Autenticación multi-factor y encriptación de datos sensibles.
-- **NFR15 (Disponibilidad)**: 99.9% de uptime con recuperación automática ante fallos.
+- **NFR13 (Accesibilidad)**: Cumplimiento completo de estándares WCAG AA para dispositivos móviles y de escritorio.
+- **NFR14 (Persistencia)**: Base de datos con tiempo de respuesta < 100ms para consultas de usuario.
+- **NFR15 (Analítica)**: Procesamiento de datos de uso en tiempo real con latencia < 5s.
+- **NFR16 (Seguridad Avanzada)**: Autenticación multi-factor y encriptación de datos sensibles.
+- **NFR17 (Disponibilidad)**: 99.9% de uptime con recuperación automática ante fallos.
 
 ## 8. Tecnologías y Herramientas
 
@@ -138,6 +140,8 @@ El simulador constará de:
 - **Infraestructura Adicional**:
   - Cloudflare CDN
   - Service Workers para funcionalidad offline básica
+- **Backend Adicional**:
+  - Estructura modular preparada para futura integración LTI 1.3
 
 ### 8.3 Versión 3.0
 - **Backend Adicional**:
@@ -179,16 +183,17 @@ El simulador constará de:
 ## 10. Plan de Versiones
 
 ### 10.1 Versión 1.0 (MVP) - Completada
-- ✅ Integra backend y frontend básicos.  
-- ✅ Despliegue funcional en VPS.  
-- ✅ Validación de flujo end-to-end.
+- [x] Integra backend y frontend básicos.  
+- [x] Despliegue funcional en VPS.  
+- [x] Validación de flujo end-to-end.
 
 ### 10.2 Versión 2.0 - En Desarrollo
 **Objetivos principales:**
-- Reducir carga cognitiva mediante andamiaje contextual
-- Implementar sistema de misiones guiadas con retroalimentación
-- Mejorar usabilidad y accesibilidad móvil
-- Integrar CDN para mejor rendimiento y seguridad
+- [ ] Reducir carga cognitiva mediante andamiaje contextual
+- [ ] Implementar sistema de misiones guiadas con retroalimentación
+- [ ] Mejorar usabilidad y accesibilidad móvil
+- [ ] Integrar CDN para mejor rendimiento y seguridad
+- [ ] Preparar arquitectura para futura compatibilidad LTI 1.3
 
 ### 10.3 Versión 3.0 - Futura
 **Objetivos principales:**
@@ -210,6 +215,7 @@ El simulador constará de:
 - Enlaces a repositorios y documentación de APIs (OpenAPI/Swagger).
 - Documentación de evaluación de usabilidad y calidad educativa.
 - Especificaciones técnicas de Cloudflare CDN.
+- Documentación del estándar LTI 1.3 para referencia futura.
 
 ---
 
