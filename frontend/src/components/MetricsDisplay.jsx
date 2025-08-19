@@ -21,13 +21,13 @@ function MetricsDisplay() {
   return (
     <div className="container-fluid">
       <div className="row g-2">
-        <MetricItem label="Vt" value={results.metricas_mecanicas.volumen_tidal_entregado.toFixed(2)} unit="L" />
-        <MetricItem label="Ppico" value={results.metricas_mecanicas.presion_pico.toFixed(1)} unit="cmH2O" />
-        <MetricItem label="Auto-PEEP" value={autoPeepValue.toFixed(1)} unit="cmH2O" />
-        <MetricItem label="GC" value={results.metricas_hemodinamicas.GC_actual_L_min.toFixed(2)} unit="L/min" />
-        <MetricItem label="PACO₂" value={results.metricas_gases.PACO2_mmHg.toFixed(1)} unit="mmHg" />
-        <MetricItem label="PAO₂" value={results.metricas_gases.PAO2_mmHg.toFixed(1)} unit="mmHg" />
-        <MetricItem label="DO₂" value={results.metricas_hemodinamicas.DO2_ml_min.toFixed(0)} unit="mL/min" />
+        <MetricItem label="Vt" value={results.metricas_mecanicas?.volumen_tidal_entregado ? results.metricas_mecanicas.volumen_tidal_entregado.toFixed(2) : 'N/A'} unit="L" />
+        <MetricItem label="Ppico" value={results.metricas_mecanicas?.presion_pico ? results.metricas_mecanicas.presion_pico.toFixed(1) : 'N/A'} unit="cmH2O" />
+        <MetricItem label="Auto-PEEP" value={autoPeepValue?.toFixed(1) ?? 'N/A'} unit="cmH2O" />
+        <MetricItem label="GC" value={results.metricas_hemodinamicas?.GC_actual_L_min ? results.metricas_hemodinamicas.GC_actual_L_min.toFixed(2) : 'N/A'} unit="L/min" />
+        <MetricItem label="PACO₂" value={results.metricas_gases?.PACO2_mmHg ? results.metricas_gases.PACO2_mmHg.toFixed(1) : 'N/A'} unit="mmHg" />
+        <MetricItem label="PAO₂" value={results.metricas_gases?.PAO2_mmHg ? results.metricas_gases.PAO2_mmHg.toFixed(1) : 'N/A'} unit="mmHg" />
+        <MetricItem label="DO₂" value={results.metricas_hemodinamicas?.DO2_ml_min ? results.metricas_hemodinamicas.DO2_ml_min.toFixed(0) : 'N/A'} unit="mL/min" />
       </div>
     </div>
   );

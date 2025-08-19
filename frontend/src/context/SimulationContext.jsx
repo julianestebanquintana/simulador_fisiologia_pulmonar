@@ -1,9 +1,8 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 const SimulationContext = createContext();
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost/api';
 
-// Estado inicial con todos los parámetros
+// Estado inicial
 const initialState = {
   patient: { R1: 10.0, C1: 0.05, R2: 10.0, C2: 0.05 },
   ventilator: {
@@ -13,7 +12,7 @@ const initialState = {
     fr: 15.0,
     Ti: 1.0,
     Vt: 0.5,
-    FiO2: 0.21, // Añadido
+    FiO2: 0.21,
   },
   results: null,
   isLoading: false,
@@ -21,46 +20,44 @@ const initialState = {
 };
 
 export function SimulationProvider({ children }) {
-  const [simulationState, setSimulationState] = useState(initialState);
+  const [state, setState] = useState(initialState);
 
   const updateParameters = (newParams) => {
-    setSimulationState((prevState) => ({ ...prevState, ...newParams }));
+    setState(prev => ({ ...prev, ...newParams }));
   };
 
   const runSimulation = async () => {
-    const { patient, ventilator } = simulationState;
-    setSimulationState((prev) => ({ ...prev, isLoading: true, error: null }));
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      // El payload envía los nombres de clave que el backend espera
       const payload = {
-        paciente: patient,
-        ventilador: ventilator,
+        paciente: state.patient,
+        ventilador: state.ventilator,
       };
 
-      console.log("Enviando payload al backend:", payload);
-
-      const response = await fetch(`${API_BASE_URL}/simulate`, {
+      const response = await fetch('http://localhost/api/simulate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Ocurrió un error en el servidor');
+        throw new Error('Error en la simulación');
       }
 
       const data = await response.json();
-      setSimulationState((prev) => ({ ...prev, results: data, isLoading: false }));
+      setState(prev => ({ ...prev, results: data, isLoading: false }));
 
     } catch (err) {
-      console.error("Error al ejecutar la simulación:", err);
-      setSimulationState((prev) => ({ ...prev, isLoading: false, error: err.message }));
+      setState(prev => ({ ...prev, isLoading: false, error: err.message }));
     }
   };
 
-  const value = { simulationState, updateParameters, runSimulation };
+  const value = {
+    simulationState: state,
+    updateParameters,
+    runSimulation
+  };
 
   return (
     <SimulationContext.Provider value={value}>
@@ -71,7 +68,7 @@ export function SimulationProvider({ children }) {
 
 export function useSimulation() {
   const context = useContext(SimulationContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useSimulation debe ser usado dentro de un SimulationProvider');
   }
   return context;

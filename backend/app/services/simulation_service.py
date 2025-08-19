@@ -46,9 +46,17 @@ class SimulationService:
                 control = ControlRespiratorio()
                 simulador = Simulador(paciente, ventilador, control)
                 t, v1, v2 = simulador.simular_espontaneo()
-            else:
+            elif ventilador.modo == "VCV":
+                # Para VCV, necesitamos asegurar que Vt esté definido
+                if ventilador.Vt is None:
+                    raise ValueError("El volumen tidal (Vt) es requerido para el modo VCV")
                 simulador = Simulador(paciente, ventilador)
                 t, v1, v2 = simulador.simular(tiempo_total_deseado=30.0)
+            elif ventilador.modo == "PCV":
+                simulador = Simulador(paciente, ventilador)
+                t, v1, v2 = simulador.simular(tiempo_total_deseado=30.0)
+            else:
+                raise ValueError(f"Modo ventilatorio no soportado: {ventilador.modo}")
             
             # Procesar resultados
             resultados_mecanica = simulador.procesar_resultados(t, v1, v2)
@@ -95,6 +103,18 @@ class SimulationService:
                                resultados_gases: Dict[str, Any], 
                                resultados_hemo: Dict[str, Any]) -> Dict[str, Any]:
         """Prepara la respuesta final de la simulación"""
+        
+        # En modo espontáneo, las métricas de mecánica ventilatora no aplican
+        if resultados_mecanica.get("modo") == "ESPONTANEO":
+            volumen_tidal_entregado = 0
+            presion_pico = 0
+        else:
+            volumen_tidal_entregado = (
+                np.max(resultados_mecanica["Vt"][-200:])
+                - np.min(resultados_mecanica["Vt"][-200:])
+            )
+            presion_pico = np.max(resultados_mecanica["P_aw"])
+            
         return {
             "series_tiempo": {
                 "tiempo": resultados_mecanica["t"].tolist(),
@@ -103,11 +123,8 @@ class SimulationService:
                 "volumen_total": resultados_mecanica["Vt"].tolist(),
             },
             "metricas_mecanicas": {
-                "volumen_tidal_entregado": (
-                    np.max(resultados_mecanica["Vt"][-200:])
-                    - np.min(resultados_mecanica["Vt"][-200:])
-                ),
-                "presion_pico": np.max(resultados_mecanica["P_aw"]),
+                "volumen_tidal_entregado": volumen_tidal_entregado,
+                "presion_pico": presion_pico,
             },
             "metricas_gases": resultados_gases,
             "metricas_hemodinamicas": resultados_hemo,

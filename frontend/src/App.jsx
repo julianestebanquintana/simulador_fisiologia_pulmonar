@@ -1,10 +1,22 @@
 import React from 'react';
+import { useSimulation } from './context/SimulationContext';
 import ParameterForm from './components/ParameterForm';
 import SimulationCharts from './components/SimulationCharts';
 import MetricsDisplay from './components/MetricsDisplay';
 import './App.css';
 
 function App() {
+  const { simulationState, updateParameters, runSimulation } = useSimulation();
+  const { patient, ventilator, isLoading } = simulationState;
+
+  const handleParameterChange = (changes) => {
+    updateParameters(changes);
+  };
+
+  const handleRunSimulation = () => {
+    runSimulation();
+  };
+
   return (
     <div className="app-container container-fluid p-3">
       <header className="mb-3">
@@ -16,7 +28,12 @@ function App() {
         {/* Columna Izquierda: Panel de Control */}
         <aside className="col-md-4 border-end sidebar">
           <div className="sidebar-content">
-            <ParameterForm />
+            <ParameterForm
+              parameters={{ patient, ventilator }}
+              onParameterChange={handleParameterChange}
+              onRunSimulation={handleRunSimulation}
+              isLoading={isLoading}
+            />
           </div>
         </aside>
 

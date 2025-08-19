@@ -152,6 +152,7 @@ class Simulador:
         V0 = [0.0, 0.0]
         # Condición inicial para la primera iteración del controlador
         paco2_actual = 55.0  # Empezamos con hipercapnia para forzar una respuesta
+        tiempo_actual = 0.0
 
         for i in range(iteraciones):
             # 1. El controlador ajusta el impulso ventilatorio basado en el CO2
@@ -163,8 +164,8 @@ class Simulador:
             tiempo_ciclo = 60.0 / self.ventilador.fr
             
             # 2. Simulamos UN ciclo con el nuevo impulso ventilatorio
-            t0 = i * tiempo_ciclo
-            t1 = (i + 1) * tiempo_ciclo
+            t0 = tiempo_actual
+            t1 = tiempo_actual + tiempo_ciclo
             t_eval = np.linspace(t0, t1, pasos_por_ciclo)
 
             # La función de presión ahora es la Pmus generada por el control
@@ -191,6 +192,7 @@ class Simulador:
             V1_data.append(sol.y[0])
             V2_data.append(sol.y[1])
             V0 = sol.y[:, -1]
+            tiempo_actual = t1
 
         return (np.concatenate(t_data),
                 np.concatenate(V1_data),

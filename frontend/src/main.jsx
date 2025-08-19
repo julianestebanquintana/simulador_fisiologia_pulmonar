@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
 import { SimulationProvider } from './context/SimulationContext';
 import './index.css';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+// import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -16,4 +16,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 );
 
 // Registrar Service Worker para funcionalidad offline
-serviceWorkerRegistration.register();
+// serviceWorkerRegistration.register(); // Deshabilitado temporalmente por problemas de cache
