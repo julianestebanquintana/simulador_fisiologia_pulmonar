@@ -29,6 +29,12 @@ export default defineConfig({
   // Optimizaciones de desarrollo
   server: {
     port: 3000,
-    host: true
+    host: true,
+    proxy: {
+      '/api': {
+        target: 'http://backend:8000',
+        changeOrigin: true,
+      }
+    }
   }
 });

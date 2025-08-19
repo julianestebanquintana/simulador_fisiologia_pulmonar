@@ -43,7 +43,7 @@ export function SimulationProvider({ children }) {
         fisiologia: state.fisiologia,
       };
 
-      const response = await fetch('http://localhost/api/simulate', {
+      const response = await fetch('/api/simulate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

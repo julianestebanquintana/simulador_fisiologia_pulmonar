@@ -1,33 +1,58 @@
 /* Hacemos que el contenedor principal ocupe toda la altura */
 .app-container {
-  height: 100vh;
+  min-height: 100vh; /* Usar min-height para permitir el crecimiento en móvil */
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Prevenir scroll en el contenedor principal */
 }
 
 /* Permitimos que la sección principal crezca para llenar el espacio */
 .main-content {
   flex-grow: 1;
-  /* Importante para que los hijos con altura flexible funcionen */
-  min-height: 0;
-  overflow: hidden; /* Prevenir scroll horizontal */
+}
+
+/* En pantallas grandes, aplicamos el layout de dashboard fijo */
+@media (min-width: 768px) {
+  .app-container {
+    height: 100vh;
+    overflow-y: hidden; /* Prevenir scroll vertical en el contenedor principal */
+  }
+
+  .main-content {
+    min-height: 0;
+    overflow: hidden;
+  }
+  
+  .charts-column, .sidebar {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .sidebar-content {
+    overflow-y: auto; /* Solo en escritorio el sidebar tiene su propio scroll */
+  }
 }
 
 /* Contenedor de la columna de visualización */
 .charts-column {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  overflow: hidden; /* Prevenir desbordamiento */
 }
 
 /* Contenedor específico para cada gráfico */
 .chart-wrapper {
-  flex: 1 1 0; /* Permite que cada gráfico ocupe un tercio del espacio */
+  flex: 1 1 0; /* Permite que cada gráfico ocupe un tercio del espacio en escritorio */
   position: relative;
-  /* Esto es clave para evitar que el contenido desborde y force el crecimiento */
-  min-height: 0;
+  min-height: 0; /* Clave para que el flexbox funcione correctamente en escritorio */
+}
+
+/* Estilos específicos para pantallas pequeñas (móviles) */
+@media (max-width: 767px) {
+  .chart-wrapper {
+    /* En móvil, cada gráfico tiene una altura fija y la página hace scroll */
+    flex: none; /* Desactivamos el comportamiento flex */
+    height: 250px;
+    margin-bottom: 1rem; /* Añadimos espacio entre gráficos */
+  }
 }
 
 /* Panel de control */
@@ -51,10 +76,13 @@
   margin-top: auto; /* Empujar hacia abajo */
 }
 
+/* Corregir el ajuste de texto en etiquetas de formularios para que no se rompan en layouts estrechos */
+.form-label {
+  overflow-wrap: break-word;
+}
+
 /* Estilos para el sidebar */
 .sidebar {
-  height: 100%;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
 }

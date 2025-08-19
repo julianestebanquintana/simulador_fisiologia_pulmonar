@@ -34,7 +34,7 @@ const SimpleMode = ({ parameters, onParameterChange, onRunSimulation, isLoading 
           <Row>
             {/* Modo de Ventilación */}
             <Col md={6} className="mb-3">
-              <Form.Group>
+              <Form.Group controlId="simple-mode-select">
                 <Form.Label>
                   Modo de Ventilación
                   <CustomTooltip content="<strong>PCV:</strong> El ventilador mantiene una presión constante<br/><strong>VCV:</strong> El ventilador entrega un volumen fijo<br/><strong>Espontáneo:</strong> El paciente respira por sí mismo">
@@ -54,7 +54,7 @@ const SimpleMode = ({ parameters, onParameterChange, onRunSimulation, isLoading 
 
             {/* PEEP */}
             <Col md={6} className="mb-3">
-              <Form.Group>
+              <Form.Group controlId="simple-peep-input">
                 <Form.Label>
                   PEEP (cmH₂O)
                   <CustomTooltip content="<strong>PEEP:</strong> Presión que se mantiene en las vías aéreas<br/>al final de la espiración. Ayuda a mantener los alvéolos abiertos.">
@@ -77,7 +77,7 @@ const SimpleMode = ({ parameters, onParameterChange, onRunSimulation, isLoading 
             <Row>
               {/* Presión de Conducción o Volumen Tidal */}
               <Col md={6} className="mb-3">
-                <Form.Group>
+                <Form.Group controlId="simple-driving-vt-input">
                   <Form.Label>
                     {parameters.ventilator.modo === 'PCV' ? 'Presión de Conducción (cmH₂O)' : 'Volumen Tidal (L)'}
                     <CustomTooltip content={parameters.ventilator.modo === 'PCV' 
@@ -110,7 +110,7 @@ const SimpleMode = ({ parameters, onParameterChange, onRunSimulation, isLoading 
 
               {/* Frecuencia Respiratoria */}
               <Col md={6} className="mb-3">
-                <Form.Group>
+                <Form.Group controlId="simple-fr-input">
                   <Form.Label>
                     Frecuencia Respiratoria (rpm)
                     <CustomTooltip content="<strong>Frecuencia Respiratoria:</strong> Número de respiraciones<br/>por minuto. Controla qué tan rápido respira el paciente.">

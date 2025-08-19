@@ -26,7 +26,7 @@ function App() {
 
       <main className="row main-content">
         {/* Columna Izquierda: Panel de Control */}
-        <aside className="col-md-4 border-end sidebar">
+        <aside className="col-12 col-md-4 border-end sidebar">
           <div className="sidebar-content">
             <ParameterForm
               parameters={{ patient, ventilator, fisiologia }}
@@ -38,7 +38,7 @@ function App() {
         </aside>
 
         {/* Columna Derecha: Visualizaciones */}
-        <section className="col-md-8 charts-column">
+        <section className="col-12 col-md-8 charts-column">
           {/* Fila Superior para Gráficos */}
           <div className="flex-grow-1 p-3">
             <h2>Visualización</h2>
