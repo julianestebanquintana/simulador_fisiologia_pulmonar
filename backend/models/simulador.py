@@ -135,7 +135,8 @@ class Simulador:
             'flow2': flujo2,
             'flow': flujo_total,
             'P_aw': P_aw,
-            'auto_peep': auto_peep_calculado
+            'auto_peep': auto_peep_calculado,
+            'modo': self.ventilador.modo
         }
 
     def simular_espontaneo(self,
@@ -161,7 +162,7 @@ class Simulador:
             
             # Actualizamos los parámetros del ventilador para el ciclo actual
             self.ventilador.fr = frec_hz * 60.0
-            tiempo_ciclo = 60.0 / self.ventilador.fr
+            tiempo_ciclo = 60.0 / self.ventilador.fr if self.ventilador.fr > 0 else float('inf')
             
             # 2. Simulamos UN ciclo con el nuevo impulso ventilatorio
             t0 = tiempo_actual
@@ -181,11 +182,18 @@ class Simulador:
                     self.paciente.R2, self.paciente.E2)
             )
 
-            # 3. Procesamos el resultado para obtener el nuevo CO2
+            # 3. (Eliminado) El procesamiento de gases ahora se hace en el SimulationService.
+            #    Aquí solo nos enfocamos en la mecánica.
+            #    Actualizamos paco2_actual de forma simple para la siguiente iteración.
             resultados_ciclo = self.procesar_resultados(sol.t, sol.y[0], sol.y[1])
-            intercambio = IntercambioGases(ventilador=self.ventilador, V_D=0.15, VCO2=200, R=0.8, FiO2=0.21, Pb=560)
-            resultados_gases = intercambio.calcular(resultados_ciclo)
-            paco2_actual = resultados_gases['PACO2_mmHg']
+            volumen_tidal_ciclo = np.max(resultados_ciclo['Vt']) - np.min(resultados_ciclo['Vt'])
+            
+            # Heurística simple: si el Vt es bajo, el CO2 sube. Si es alto, baja.
+            if volumen_tidal_ciclo < 0.4:
+                paco2_actual += 2.0
+            else:
+                paco2_actual -= 2.0
+            paco2_actual = max(30.0, min(80.0, paco2_actual)) # Limitar el rango
 
             # 4. Guardamos y propagamos el estado para el siguiente ciclo
             t_data.append(sol.t)

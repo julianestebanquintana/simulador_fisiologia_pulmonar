@@ -73,60 +73,62 @@ const SimpleMode = ({ parameters, onParameterChange, onRunSimulation, isLoading 
             </Col>
           </Row>
 
-          <Row>
-            {/* Presión de Conducción o Volumen Tidal */}
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>
-                  {parameters.ventilator.modo === 'PCV' ? 'Presión de Conducción (cmH₂O)' : 'Volumen Tidal (L)'}
-                  <CustomTooltip content={parameters.ventilator.modo === 'PCV' 
-                    ? "<strong>Presión de Conducción:</strong> Presión máxima que alcanza<br/>el ventilador durante la inspiración. Controla qué tan fuerte<br/>respira el paciente."
-                    : "<strong>Volumen Tidal:</strong> Cantidad de aire que se entrega<br/>en cada respiración. Típicamente 6-8 ml/kg de peso corporal."
-                  }>
-                    <i className="fas fa-info-circle ms-2 text-info" />
-                  </CustomTooltip>
-                </Form.Label>
-                <Form.Control
-                  type="number"
-                  min={parameters.ventilator.modo === 'PCV' ? "5" : "0.1"}
-                  max={parameters.ventilator.modo === 'PCV' ? "50" : "2"}
-                  step={parameters.ventilator.modo === 'PCV' ? "1" : "0.1"}
-                  value={parameters.ventilator.modo === 'PCV' 
-                    ? parameters.ventilator.P_driving 
-                    : parameters.ventilator.Vt
-                  }
-                  onChange={(e) => {
-                    const value = parseFloat(e.target.value);
-                    if (parameters.ventilator.modo === 'PCV') {
-                      handleInputChange('P_driving', value);
-                    } else {
-                      handleInputChange('Vt', value);
+          {parameters.ventilator.modo !== 'ESPONTANEO' && (
+            <Row>
+              {/* Presión de Conducción o Volumen Tidal */}
+              <Col md={6} className="mb-3">
+                <Form.Group>
+                  <Form.Label>
+                    {parameters.ventilator.modo === 'PCV' ? 'Presión de Conducción (cmH₂O)' : 'Volumen Tidal (L)'}
+                    <CustomTooltip content={parameters.ventilator.modo === 'PCV' 
+                      ? "<strong>Presión de Conducción:</strong> Presión máxima que alcanza<br/>el ventilador durante la inspiración. Controla qué tan fuerte<br/>respira el paciente."
+                      : "<strong>Volumen Tidal:</strong> Cantidad de aire que se entrega<br/>en cada respiración. Típicamente 6-8 ml/kg de peso corporal."
+                    }>
+                      <i className="fas fa-info-circle ms-2 text-info" />
+                    </CustomTooltip>
+                  </Form.Label>
+                  <Form.Control
+                    type="number"
+                    min={parameters.ventilator.modo === 'PCV' ? "5" : "0.1"}
+                    max={parameters.ventilator.modo === 'PCV' ? "50" : "2"}
+                    step={parameters.ventilator.modo === 'PCV' ? "1" : "0.1"}
+                    value={parameters.ventilator.modo === 'PCV' 
+                      ? parameters.ventilator.P_driving 
+                      : parameters.ventilator.Vt
                     }
-                  }}
-                />
-              </Form.Group>
-            </Col>
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      if (parameters.ventilator.modo === 'PCV') {
+                        handleInputChange('P_driving', value);
+                      } else {
+                        handleInputChange('Vt', value);
+                      }
+                    }}
+                  />
+                </Form.Group>
+              </Col>
 
-            {/* Frecuencia Respiratoria */}
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>
-                  Frecuencia Respiratoria (rpm)
-                  <CustomTooltip content="<strong>Frecuencia Respiratoria:</strong> Número de respiraciones<br/>por minuto. Controla qué tan rápido respira el paciente.">
-                    <i className="fas fa-info-circle ms-2 text-info" />
-                  </CustomTooltip>
-                </Form.Label>
-                <Form.Control
-                  type="number"
-                  min="5"
-                  max="40"
-                  step="1"
-                  value={parameters.ventilator.fr}
-                  onChange={(e) => handleInputChange('fr', parseFloat(e.target.value))}
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+              {/* Frecuencia Respiratoria */}
+              <Col md={6} className="mb-3">
+                <Form.Group>
+                  <Form.Label>
+                    Frecuencia Respiratoria (rpm)
+                    <CustomTooltip content="<strong>Frecuencia Respiratoria:</strong> Número de respiraciones<br/>por minuto. Controla qué tan rápido respira el paciente.">
+                      <i className="fas fa-info-circle ms-2 text-info" />
+                    </CustomTooltip>
+                  </Form.Label>
+                  <Form.Control
+                    type="number"
+                    min="5"
+                    max="40"
+                    step="1"
+                    value={parameters.ventilator.fr}
+                    onChange={(e) => handleInputChange('fr', parseFloat(e.target.value))}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          )}
 
           {/* Botón de Ejecutar Simulación */}
           <Row>

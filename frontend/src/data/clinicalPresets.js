@@ -18,6 +18,13 @@ export const clinicalPresets = {
       Ti: 1.0,
       Vt: 0.5,
       FiO2: 0.21
+    },
+    fisiologia: {
+      k_sensibilidad: 0.1,
+      Gp_control: 0.3,
+      Gi_control: 0.01,
+      Qs_Qt: 0.05, // Shunt fisiológico del 5%
+      V_D: 0.15    // Espacio muerto normal (aprox 2 mL/kg)
     }
   },
 
@@ -38,6 +45,13 @@ export const clinicalPresets = {
       Ti: 1.2,
       Vt: 0.6,
       FiO2: 0.30
+    },
+    fisiologia: {
+      k_sensibilidad: 0.1,  // Sensibilidad hemodinámica normal-baja
+      Gp_control: 0.15, // Ganancia baja (retención crónica de CO2)
+      Gi_control: 0.005,
+      Qs_Qt: 0.10, // Shunt moderado por V/Q mismatch
+      V_D: 0.25    // Espacio muerto aumentado
     }
   },
 
@@ -58,6 +72,13 @@ export const clinicalPresets = {
       Ti: 0.8,
       Vt: 0.4,    // Volumen tidal bajo (estrategia protectora)
       FiO2: 0.60
+    },
+    fisiologia: {
+      k_sensibilidad: 0.25, // Hipovolemia/shock, alta sensibilidad
+      Gp_control: 0.4,  // Drive respiratorio aumentado por hipoxemia
+      Gi_control: 0.02,
+      Qs_Qt: 0.35, // Shunt severo del 35%
+      V_D: 0.20    // Espacio muerto aumentado
     }
   },
 
@@ -78,6 +99,13 @@ export const clinicalPresets = {
       Ti: 1.0,
       Vt: 0.5,
       FiO2: 0.40
+    },
+    fisiologia: {
+      k_sensibilidad: 0.18, // Sensibilidad aumentada (riesgo de sepsis)
+      Gp_control: 0.35,
+      Gi_control: 0.015,
+      Qs_Qt: 0.20, // Shunt del 20% por consolidación
+      V_D: 0.18
     }
   },
 
@@ -98,6 +126,13 @@ export const clinicalPresets = {
       Ti: 1.5,
       Vt: 0.7,
       FiO2: 0.50
+    },
+    fisiologia: {
+      k_sensibilidad: 0.12,
+      Gp_control: 0.20, // Drive moderado, pero la mecánica es el problema
+      Gi_control: 0.008,
+      Qs_Qt: 0.15, // V/Q mismatch
+      V_D: 0.22
     }
   },
 
@@ -118,6 +153,13 @@ export const clinicalPresets = {
       Ti: 0.6,    // Tiempo inspiratorio corto
       Vt: 0.3,    // Volumen tidal muy bajo
       FiO2: 0.50
+    },
+    fisiologia: {
+      k_sensibilidad: 0.20, // Paciente crítico
+      Gp_control: 0.4,
+      Gi_control: 0.02,
+      Qs_Qt: 0.25, // Shunt significativo
+      V_D: 0.19
     }
   }
 };

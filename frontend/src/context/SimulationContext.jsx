@@ -14,6 +14,13 @@ const initialState = {
     Vt: 0.5,
     FiO2: 0.21,
   },
+  fisiologia: {
+    k_sensibilidad: 0.1,
+    Gp_control: 0.3,
+    Gi_control: 0.01,
+    Qs_Qt: 0.05,
+    V_D: 0.15
+  },
   results: null,
   isLoading: false,
   error: null,
@@ -33,6 +40,7 @@ export function SimulationProvider({ children }) {
       const payload = {
         paciente: state.patient,
         ventilador: state.ventilator,
+        fisiologia: state.fisiologia,
       };
 
       const response = await fetch('http://localhost/api/simulate', {

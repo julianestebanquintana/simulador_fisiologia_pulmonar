@@ -9,7 +9,8 @@ class Ventilador:
                  P_driving: float = 15.0,
                  fr: float = 20.0,
                  Ti: float = 1.0,
-                 Vt: float = None):
+                 Vt: float = None,
+                 FiO2: float = 0.21):
         self.modo = modo
         self.PEEP = PEEP
         self.P_driving = P_driving
@@ -17,6 +18,7 @@ class Ventilador:
         self.Ti = Ti
         self.T_total = 60.0 / fr
         self.Vt = Vt
+        self.FiO2 = FiO2
         if modo == 'VCV':
             assert Vt is not None, "Se requiere Vt para modo VCV"
             self.flow_insp = Vt / Ti

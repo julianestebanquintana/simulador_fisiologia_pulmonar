@@ -7,7 +7,7 @@ import './App.css';
 
 function App() {
   const { simulationState, updateParameters, runSimulation } = useSimulation();
-  const { patient, ventilator, isLoading } = simulationState;
+  const { patient, ventilator, fisiologia, isLoading } = simulationState;
 
   const handleParameterChange = (changes) => {
     updateParameters(changes);
@@ -29,7 +29,7 @@ function App() {
         <aside className="col-md-4 border-end sidebar">
           <div className="sidebar-content">
             <ParameterForm
-              parameters={{ patient, ventilator }}
+              parameters={{ patient, ventilator, fisiologia }}
               onParameterChange={handleParameterChange}
               onRunSimulation={handleRunSimulation}
               isLoading={isLoading}

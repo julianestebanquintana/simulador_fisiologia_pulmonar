@@ -30,11 +30,21 @@ class VentiladorParams(BaseModel):
     fr: float = Field(15.0, gt=0, description="Frecuencia respiratoria (rpm)")
     Ti: float = Field(1.0, gt=0, description="Tiempo inspiratorio (s)")
     Vt: float = Field(0.5, gt=0, description="Volumen Tidal para VCV (L)")
+    FiO2: float = Field(0.21, ge=0.21, le=1.0, description="Fracción inspirada de O2")
+
+
+class FisiologiaAvanzadaParams(BaseModel):
+    k_sensibilidad: float = Field(0.1, ge=0, description="Sensibilidad hemodinámica a la presión")
+    Gp_control: float = Field(0.3, ge=0, description="Ganancia Proporcional del control respiratorio")
+    Gi_control: float = Field(0.01, ge=0, description="Ganancia Integral del control respiratorio")
+    Qs_Qt: float = Field(0.05, ge=0, le=1, description="Fracción de Shunt")
+    V_D: float = Field(0.15, ge=0, description="Volumen de espacio muerto (L)")
 
 
 class SimulationRequest(BaseModel):
     paciente: PacienteParams
     ventilador: VentiladorParams
+    fisiologia: FisiologiaAvanzadaParams
 
 
 # --- Endpoint de Simulación ---
@@ -49,6 +59,7 @@ async def run_simulation(request: SimulationRequest):
         # Validar parámetros
         paciente_params = request.paciente.model_dump()
         ventilador_params = request.ventilador.model_dump()
+        fisiologia_params = request.fisiologia.model_dump()
         
         # Validar parámetros del paciente
         patient_error = ParameterValidator.validate_patient_params(paciente_params)
@@ -61,7 +72,9 @@ async def run_simulation(request: SimulationRequest):
             raise HTTPException(status_code=400, detail=f"Error en parámetros del ventilador: {ventilator_error}")
         
         # Ejecutar simulación usando el servicio
-        resultado = simulation_service.run_simulation(paciente_params, ventilador_params)
+        resultado = simulation_service.run_simulation(
+            paciente_params, ventilador_params, fisiologia_params
+        )
         
         logger.info("Simulación completada exitosamente.")
         return resultado
