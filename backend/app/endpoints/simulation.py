@@ -1,19 +1,17 @@
 import logging
-import numpy as np
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 from typing import Dict, Any
 
-# Clases de simulación
-from models.paciente import Paciente
-from models.ventilador import Ventilador
-from models.simulador import Simulador
-from models.intercambio import IntercambioGases
-from models.hemodinamica import InteraccionCorazonPulmon
-from models.control import ControlRespiratorio
+# Servicios y utilidades
+from app.services.simulation_service import SimulationService
+from app.utils.validators import ParameterValidator
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="", tags=["Simulación"])
+
+# Instancia del servicio de simulación
+simulation_service = SimulationService()
 
 
 # --- Modelos Pydantic ---
@@ -46,56 +44,27 @@ async def run_simulation(request: SimulationRequest):
     Ejecuta una simulación cardiorrespiratoria integral.
     """
     logger.info(f"Iniciando simulación con parámetros: {request.model_dump()}")
+    
     try:
-        paciente = Paciente(**request.paciente.model_dump())
-        ventilador = Ventilador(**request.ventilador.model_dump())
+        # Validar parámetros
+        paciente_params = request.paciente.model_dump()
+        ventilador_params = request.ventilador.model_dump()
         
-        if ventilador.modo == "ESPONTANEO":
-            control = ControlRespiratorio()
-            simulador = Simulador(paciente, ventilador, control)
-            t, v1, v2 = simulador.simular_espontaneo()
-        else:
-            simulador = Simulador(paciente, ventilador)
-            # Cambiar a 30 segundos para coincidir con el frontend
-            t, v1, v2 = simulador.simular(tiempo_total_deseado=30.0)
+        # Validar parámetros del paciente
+        patient_error = ParameterValidator.validate_patient_params(paciente_params)
+        if patient_error:
+            raise HTTPException(status_code=400, detail=f"Error en parámetros del paciente: {patient_error}")
         
-        resultados_mecanica = simulador.procesar_resultados(t, v1, v2)
-
-        intercambio_gases = IntercambioGases(
-            ventilador=ventilador, V_D=0.15, VCO2=200, R=0.8, FiO2=0.21, Pb=560
-        )
-        resultados_gases = intercambio_gases.calcular(resultados_mecanica)
-
-        hemodinamica = InteraccionCorazonPulmon()
-        # Extraer el auto_peep calculado por el módulo mecánico
-        auto_peep_calculado = resultados_mecanica.get("auto_peep", 0.0)
-
-        resultados_hemo = hemodinamica.calcular(
-            resultados_mecanica,
-            resultados_gases,
-            ventilador,
-            auto_peep_cmH2O=auto_peep_calculado,
-        )
-
-        respuesta_final = {
-            "series_tiempo": {
-                "tiempo": resultados_mecanica["t"].tolist(),
-                "presion_via_aerea": resultados_mecanica["P_aw"].tolist(),
-                "flujo_total": resultados_mecanica["flow"].tolist(),
-                "volumen_total": resultados_mecanica["Vt"].tolist(),
-            },
-            "metricas_mecanicas": {
-                "volumen_tidal_entregado": (
-                    np.max(resultados_mecanica["Vt"][-200:])
-                    - np.min(resultados_mecanica["Vt"][-200:])
-                ),
-                "presion_pico": np.max(resultados_mecanica["P_aw"]),
-            },
-            "metricas_gases": resultados_gases,
-            "metricas_hemodinamicas": resultados_hemo,
-        }
+        # Validar parámetros del ventilador
+        ventilator_error = ParameterValidator.validate_ventilator_params(ventilador_params)
+        if ventilator_error:
+            raise HTTPException(status_code=400, detail=f"Error en parámetros del ventilador: {ventilator_error}")
+        
+        # Ejecutar simulación usando el servicio
+        resultado = simulation_service.run_simulation(paciente_params, ventilador_params)
+        
         logger.info("Simulación completada exitosamente.")
-        return respuesta_final
+        return resultado
 
     except ValueError as ve:
         logger.error(f"Error de validación: {ve}", exc_info=True)
