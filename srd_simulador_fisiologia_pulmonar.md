@@ -1,6 +1,6 @@
 # Documento de Requisitos de Software (Software Requirements Document - SRD)
 
-**Versión**: 1.0  
+**Versión**: 1.1  
 **Autor**: Julián Esteban Quintana Puerta
 **Fecha**: 12 de agosto de 2025
 
@@ -55,20 +55,21 @@ El simulador constará de:
 | FR9  | Añadir modo "avanzado" para desbloquear parámetros técnicos completos. |
 | FR10 | Integrar tooltips con definiciones claras para cada parámetro técnico. |
 | FR11 | Establecer valores por defecto que representen escenarios clínicos realistas. |
-| FR12 | Crear sistema de "misiones" guiadas con objetivos claros y medibles. |
-| FR13 | Implementar retroalimentación inmediata mediante rúbricas simples. |
-| FR14 | Añadir paneles de análisis automático con métricas derivadas importantes. |
-| FR15 | Implementar "pausas" interactivas que inviten al usuario a predecir resultados. |
 | FR16 | Mejorar la jerarquía visual de la interfaz para mayor intuitividad. |
 | FR17 | Añadir indicadores de carga y retroalimentación del sistema. |
 | FR18 | Implementar diseño responsive para dispositivos móviles. |
 | FR19 | Asegurar cumplimiento de estándares básicos de accesibilidad (WCAG AA). |
 | FR20 | Integrar CDN (Cloudflare) para mejorar rendimiento y seguridad. |
 | FR21 | Preparar arquitectura del código para compatibilidad futura con estándar LTI 1.3. |
+|*Nota: Los requisitos FR12, FR13, FR14 y FR15 se han movido a la Versión 3.0.*|
 
 ### 6.3 Versión 3.0 - Plataforma Educativa Completa
 | ID   | Descripción                                                          |
 |------|----------------------------------------------------------------------|
+| FR12 | Crear sistema de "misiones" guiadas con objetivos claros y medibles. |
+| FR13 | Implementar retroalimentación inmediata mediante rúbricas simples. |
+| FR14 | Añadir paneles de análisis automático con métricas derivadas importantes. |
+| FR15 | Implementar "pausas" interactivas que inviten al usuario a predecir resultados. |
 | FR23 | Sistema de autenticación diferenciado entre estudiantes e instructores. |
 | FR24 | Experiencias adaptativas que ajusten complejidad según nivel del usuario. |
 | FR25 | Plataforma de creación y gestión de escenarios clínicos por docentes. |
@@ -189,14 +190,16 @@ El simulador constará de:
 
 ### 10.2 Versión 2.0 - En Desarrollo
 **Objetivos principales:**
-- [ ] Reducir carga cognitiva mediante andamiaje contextual
-- [ ] Implementar sistema de misiones guiadas con retroalimentación
-- [ ] Mejorar usabilidad y accesibilidad móvil
-- [ ] Integrar CDN para mejor rendimiento y seguridad
-- [ ] Preparar arquitectura para futura compatibilidad LTI 1.3
+- [x] Reducir carga cognitiva mediante andamiaje contextual (modos simple/avanzado, tooltips).
+- [ ] Mejorar usabilidad y accesibilidad móvil.
+- [x] Integrar CDN para mejor rendimiento y seguridad.
+- [x] Preparar arquitectura para futura compatibilidad LTI 1.3.
+- [x] Implementar parametrización fisiológica avanzada para mayor realismo.
 
 ### 10.3 Versión 3.0 - Futura
 **Objetivos principales:**
+- [ ] Implementar sistema de misiones guiadas con retroalimentación.
+- [ ] Añadir análisis automático y pausas interactivas.
 - Transformar en plataforma educativa completa
 - Implementar gestión de usuarios y personalización
 - Añadir modelos fisiológicos avanzados

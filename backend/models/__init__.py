@@ -1,5 +1,5 @@
 """
-Este paquete contiene las clases fundamentales para 
+Este paquete contiene las clases fundamentales para
 la simulación de fisiología pulmonar.
 """
 
@@ -12,10 +12,10 @@ from .control import ControlRespiratorio
 
 # Opcional: define qué se importa con 'from models import *'
 __all__ = [
-    'Paciente',
-    'Ventilador',
-    'Simulador',
-    'IntercambioGases',
-    'InteraccionCorazonPulmon',
-    'ControlRespiratorio'
+    "Paciente",
+    "Ventilador",
+    "Simulador",
+    "IntercambioGases",
+    "InteraccionCorazonPulmon",
+    "ControlRespiratorio",
 ]

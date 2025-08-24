@@ -2,17 +2,19 @@
 import numpy as np
 from .ventilador import Ventilador
 
+
 class InteraccionCorazonPulmon:
     """
     Módulo de interacción hemodinámica corazón-pulmón.
-    
+
     Modela el efecto de la presión en la vía aérea sobre el gasto cardíaco.
     """
+
     def __init__(
         self,
         GC_base_L_min: float = 5.0,
         k_sensibilidad: float = 0.1,
-        hb_g_dl: float = 15.0
+        hb_g_dl: float = 15.0,
     ):
         """
         Inicializa el estado cardiovascular basal del paciente.
@@ -24,7 +26,7 @@ class InteraccionCorazonPulmon:
         k_sensibilidad : float
             Factor de sensibilidad hemodinámica a la presión intratorácica.
             Un valor bajo (~0.05-0.1) simula un paciente normovolémico.
-            Un valor alto (>0.2) simula un paciente hipovolémico o con 
+            Un valor alto (>0.2) simula un paciente hipovolémico o con
             disfunción cardíaca.
         hb_g_dl : float
             Concentración de hemoglobina en g/dL.
@@ -56,7 +58,7 @@ class InteraccionCorazonPulmon:
         resultados_mecanica: dict,
         resultados_gases: dict,
         ventilador: Ventilador,
-        auto_peep_cmH2O: float
+        auto_peep_cmH2O: float,
     ) -> dict:
         """
         Calcula el impacto hemodinámico de la ventilación mecánica.
@@ -80,16 +82,16 @@ class InteraccionCorazonPulmon:
             CAO2_ml_dl: Contenido arterial de O2.
             DO2_ml_min: Entrega de oxígeno a los tejidos.
         """
-        t = resultados_mecanica['t']
-        P_aw = resultados_mecanica['P_aw']
-        PAO2_mmHg = resultados_gases['PAO2_mmHg']
+        t = resultados_mecanica["t"]
+        P_aw = resultados_mecanica["P_aw"]
+        PAO2_mmHg = resultados_gases["PAO2_mmHg"]
 
         # 1. Calcular Presión Media en la Vía Aérea (P_mean)
         # Se integra el área bajo la curva de presión y se divide por la duración
-        tiempo_total_ciclo = t[-1] - t[-2-1] if len(t)>1 else t[-1]
+        tiempo_total_ciclo = t[-1] - t[-2 - 1] if len(t) > 1 else t[-1]
         p_aw_ultimo_ciclo = P_aw[t >= t[-1] - tiempo_total_ciclo]
         t_ultimo_ciclo = t[t >= t[-1] - tiempo_total_ciclo]
-        area_bajo_curva = np.trapezoid(p_aw_ultimo_ciclo, t_ultimo_ciclo)
+        area_bajo_curva = np.trapz(p_aw_ultimo_ciclo, t_ultimo_ciclo)
         P_mean = area_bajo_curva / (t_ultimo_ciclo[-1] - t_ultimo_ciclo[0])
 
         # 2. Calcular Gasto Cardíaco Actual
@@ -101,17 +103,17 @@ class InteraccionCorazonPulmon:
         # Asegurar que el GC no sea negativo
         # GC_actual = max(0, GC_actual)
         PEEP_aplicado = ventilador.PEEP
-        
+
         # La presión efectiva que reduce el retorno venoso es la P_mean, pero al
         # final de la espiración, es el PEEP total (aplicado + intrínseco).
         # PEEP total para un cálculo más representativo del estrés diastólico.
         PEEP_total = PEEP_aplicado + auto_peep_cmH2O
-        
+
         # La reducción del GC depende del gradiente de presión por encima del
-        # PEEP base. Se asume que el Auto-PEEP tiene un efecto aditivo sobre 
+        # PEEP base. Se asume que el Auto-PEEP tiene un efecto aditivo sobre
         # P_mean.
         delta_p = (P_mean - PEEP_aplicado) + auto_peep_cmH2O
-        
+
         reduccion_gc = self.k_sensibilidad * delta_p
         GC_actual = self.GC_base_L_min - reduccion_gc
         GC_actual = max(0, GC_actual)
@@ -131,12 +133,12 @@ class InteraccionCorazonPulmon:
         DO2_ml_min = GC_actual * CAO2_ml_dl * 10
 
         return {
-            'P_mean_cmH2O': P_mean,
-            'auto_peep_cmH2O': auto_peep_cmH2O,
-            'PEEP_total_cmH2O': PEEP_total,
-            'GC_actual_L_min': GC_actual,
-            'PaO2_mmHg': PaO2,
-            'SaO2_percent': SaO2 * 100,
-            'CAO2_ml_dl': CAO2_ml_dl,
-            'DO2_ml_min': DO2_ml_min
+            "P_mean_cmH2O": P_mean,
+            "auto_peep_cmH2O": auto_peep_cmH2O,
+            "PEEP_total_cmH2O": PEEP_total,
+            "GC_actual_L_min": GC_actual,
+            "PaO2_mmHg": PaO2,
+            "SaO2_percent": SaO2 * 100,
+            "CAO2_ml_dl": CAO2_ml_dl,
+            "DO2_ml_min": DO2_ml_min,
         }

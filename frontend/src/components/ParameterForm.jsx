@@ -1,105 +1,108 @@
-import React from 'react';
-import { Form } from 'react-bootstrap';
-import { useSimulation } from '../context/SimulationContext';
+import React, { useState } from 'react';
+import { Container, Row, Col, Button, Card, Tabs, Tab } from 'react-bootstrap';
+import SimpleMode from './SimpleMode';
+import AdvancedMode from './AdvancedMode';
+import ClinicalPresets from './ClinicalPresets';
+import { getPreset } from '../data/clinicalPresets';
 
-const ParameterSlider = ({ label, value, min, max, step, unit, onChange, name, disabled = false }) => (
-  <div className="mb-3">
-    <label htmlFor={label} className="form-label">
-      {label}: <span className="fw-bold">{value}</span> {unit}
-    </label>
-    <input
-      type="range"
-      className="form-range"
-      id={label}
-      name={name}
-      min={min}
-      max={max}
-      step={step}
-      value={value}
-      onChange={onChange}
-      disabled={disabled}
-    />
-  </div>
-);
+const ParameterForm = ({ parameters, onParameterChange, onRunSimulation, isLoading }) => {
+  const [activeTab, setActiveTab] = useState('simple');
+  const [currentPreset, setCurrentPreset] = useState('pacienteNormal');
 
-function ParameterForm() {
-  const { simulationState, updateParameters, runSimulation } = useSimulation();
-  const { patient, ventilator } = simulationState;
-  const isSpontaneous = ventilator.modo === 'ESPONTANEO';
-
-  const handlePatientChange = (e) => {
-    updateParameters({
-      patient: {
-        ...simulationState.patient,
-        [e.target.name]: parseFloat(e.target.value),
-      },
+  const handleLoadPreset = (preset) => {
+    // Cargar los parámetros del preset
+    onParameterChange({
+      patient: preset.patient,
+      ventilator: preset.ventilator
     });
+    setCurrentPreset(preset.key);
   };
 
-  const handleVentilatorChange = (e) => {
-    updateParameters({
-      ventilator: {
-        ...simulationState.ventilator,
-        [e.target.name]: e.target.type === 'number' ? parseFloat(e.target.value) : e.target.value,
-      },
-    });
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
   };
-
-  // Opciones para el menú desplegable de modos ventilatorios
-  const ventilationModes = [
-    { value: 'PCV', label: 'PCV - Presión Controlada' },
-    { value: 'VCV', label: 'VCV - Volumen Controlado' },
-    { value: 'ESPONTANEO', label: 'Espontáneo' }
-  ];
 
   return (
-    <div className="control-panel">
-      <div className="control-panel__sliders">
-        <h5 className="mt-3">Parámetros del Paciente</h5>
-        <ParameterSlider label="Resistencia 1 (R1)" name="R1" value={patient.R1} min="5" max="50" step="1" unit="cmH2O/L/s" onChange={handlePatientChange} />
-        <ParameterSlider label="Compliancia 1 (C1)" name="C1" value={patient.C1} min="0.01" max="0.1" step="0.005" unit="L/cmH2O" onChange={handlePatientChange} />
-        <ParameterSlider label="Resistencia 2 (R2)" name="R2" value={patient.R2} min="5" max="50" step="1" unit="cmH2O/L/s" onChange={handlePatientChange} />
-        <ParameterSlider label="Compliancia 2 (C2)" name="C2" value={patient.C2} min="0.01" max="0.1" step="0.005" unit="L/cmH2O" onChange={handlePatientChange} />
-        
-        <h5 className="mt-4">Modo de Ventilación</h5>
-        <Form.Group className="mb-3">
-          <Form.Select
-            name="modo"
-            value={ventilator.modo}
-            onChange={handleVentilatorChange}
-            aria-label="Seleccionar modo de ventilación"
-          >
-            {ventilationModes.map((mode) => (
-              <option key={mode.value} value={mode.value}>
-                {mode.label}
-              </option>
-            ))}
-          </Form.Select>
-        </Form.Group>
+    <Container fluid>
+      <div>
+        {/* Presets Clínicos */}
+        <ClinicalPresets 
+          onLoadPreset={handleLoadPreset}
+          currentPreset={currentPreset}
+        />
 
-        <h5 className="mt-4">Parámetros del Ventilador</h5>
-        
-        {ventilator.modo === 'PCV' && (
-          <ParameterSlider label="Presión de Conducción" name="P_driving" value={ventilator.P_driving} min="5" max="35" step="1" unit="cmH2O" onChange={handleVentilatorChange} disabled={isSpontaneous} />
+        {/* Selector de Modo */}
+        <Card className="mb-4">
+          <Card.Header>
+            <h5 className="mb-0">
+              <i className="fas fa-cog me-2"></i>
+              Configuración de Parámetros
+            </h5>
+          </Card.Header>
+          <Card.Body>
+            <Tabs
+              activeKey={activeTab}
+              onSelect={handleTabChange}
+              className="mb-3"
+            >
+              <Tab eventKey="simple" title={
+                <span>
+                  <i className="fas fa-sliders-h me-1"></i>
+                  Modo Simple
+                </span>
+              }>
+                <SimpleMode
+                  parameters={parameters}
+                  onParameterChange={onParameterChange}
+                  onRunSimulation={onRunSimulation}
+                  isLoading={isLoading}
+                />
+              </Tab>
+              
+              <Tab eventKey="advanced" title={
+                <span>
+                  <i className="fas fa-cogs me-1"></i>
+                  Modo Avanzado
+                </span>
+              }>
+                <AdvancedMode
+                  parameters={parameters}
+                  onParameterChange={onParameterChange}
+                  onRunSimulation={onRunSimulation}
+                  isLoading={isLoading}
+                />
+              </Tab>
+            </Tabs>
+          </Card.Body>
+        </Card>
+
+        {/* Información del Preset Actual */}
+        {currentPreset && (
+          <Card className="mb-4">
+            <Card.Body className="py-2">
+              <div className="d-flex justify-content-between align-items-center">
+                <div>
+                  <small className="text-muted">Preset actual:</small>
+                  <strong className="ms-2">{getPreset(currentPreset).name}</strong>
+                </div>
+                <Button
+                  variant="outline-secondary"
+                  size="sm"
+                  onClick={() => {
+                    const defaultPreset = getPreset('pacienteNormal');
+                    handleLoadPreset(defaultPreset);
+                  }}
+                >
+                  <i className="fas fa-undo me-1"></i>
+                  Restablecer
+                </Button>
+              </div>
+            </Card.Body>
+          </Card>
         )}
-
-        {ventilator.modo === 'VCV' && (
-          <ParameterSlider label="Volumen Tidal" name="Vt" value={ventilator.Vt} min="0.1" max="1.0" step="0.05" unit="L" onChange={handleVentilatorChange} disabled={isSpontaneous} />
-        )}
-        
-        <ParameterSlider label="PEEP" name="PEEP" value={ventilator.PEEP} min="0" max="25" step="1" unit="cmH2O" onChange={handleVentilatorChange} disabled={isSpontaneous} />
-        <ParameterSlider label="Frecuencia Respiratoria" name="fr" value={ventilator.fr} min="8" max="40" step="1" unit="rpm" onChange={handleVentilatorChange} disabled={isSpontaneous} />
-        <ParameterSlider label="FiO₂" name="FiO2" value={ventilator.FiO2} min="0.21" max="1.0" step="0.01" unit="" onChange={handleVentilatorChange} />
       </div>
-
-      <div className="control-panel__button d-grid mt-auto pt-3 border-top">
-        <button className="btn btn-primary btn-lg" onClick={runSimulation} disabled={simulationState.isLoading}>
-          {simulationState.isLoading ? 'Simulando...' : 'Ejecutar Simulación'}
-        </button>
-        {simulationState.error && <div className="alert alert-danger mt-2">{simulationState.error}</div>}
-      </div>
-    </div> 
+    </Container>
   );
-}
+};
 
 export default ParameterForm;
