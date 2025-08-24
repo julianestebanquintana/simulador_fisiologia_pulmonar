@@ -21,7 +21,6 @@ app = FastAPI(
 origins = [
     # Origen para el desarrollo local
     "http://localhost:3000",
-    
     # Orígenes para producción
     "http://fisiologiapulmonar.com",
     "https://fisiologiapulmonar.com",

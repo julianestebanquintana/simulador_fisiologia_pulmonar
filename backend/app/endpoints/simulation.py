@@ -34,9 +34,15 @@ class VentiladorParams(BaseModel):
 
 
 class FisiologiaAvanzadaParams(BaseModel):
-    k_sensibilidad: float = Field(0.1, ge=0, description="Sensibilidad hemodinámica a la presión")
-    Gp_control: float = Field(0.3, ge=0, description="Ganancia Proporcional del control respiratorio")
-    Gi_control: float = Field(0.01, ge=0, description="Ganancia Integral del control respiratorio")
+    k_sensibilidad: float = Field(
+        0.1, ge=0, description="Sensibilidad hemodinámica a la presión"
+    )
+    Gp_control: float = Field(
+        0.3, ge=0, description="Ganancia Proporcional del control respiratorio"
+    )
+    Gi_control: float = Field(
+        0.01, ge=0, description="Ganancia Integral del control respiratorio"
+    )
     Qs_Qt: float = Field(0.05, ge=0, le=1, description="Fracción de Shunt")
     V_D: float = Field(0.15, ge=0, description="Volumen de espacio muerto (L)")
 
@@ -53,29 +59,37 @@ async def run_simulation(request: SimulationRequest):
     """
     Ejecuta una simulación cardiorrespiratoria integral.
     """
-    logger.info(f"Iniciando simulación con parámetros: {request.model_dump()}")
-    
+    logger.info(f"Iniciando simulación con parámetros: {request.dict()}")
+
     try:
         # Validar parámetros
-        paciente_params = request.paciente.model_dump()
-        ventilador_params = request.ventilador.model_dump()
-        fisiologia_params = request.fisiologia.model_dump()
-        
+        paciente_params = request.paciente.dict()
+        ventilador_params = request.ventilador.dict()
+        fisiologia_params = request.fisiologia.dict()
+
         # Validar parámetros del paciente
         patient_error = ParameterValidator.validate_patient_params(paciente_params)
         if patient_error:
-            raise HTTPException(status_code=400, detail=f"Error en parámetros del paciente: {patient_error}")
-        
+            raise HTTPException(
+                status_code=400,
+                detail=f"Error en parámetros del paciente: {patient_error}",
+            )
+
         # Validar parámetros del ventilador
-        ventilator_error = ParameterValidator.validate_ventilator_params(ventilador_params)
+        ventilator_error = ParameterValidator.validate_ventilator_params(
+            ventilador_params
+        )
         if ventilator_error:
-            raise HTTPException(status_code=400, detail=f"Error en parámetros del ventilador: {ventilator_error}")
-        
+            raise HTTPException(
+                status_code=400,
+                detail=f"Error en parámetros del ventilador: {ventilator_error}",
+            )
+
         # Ejecutar simulación usando el servicio
         resultado = simulation_service.run_simulation(
             paciente_params, ventilador_params, fisiologia_params
         )
-        
+
         logger.info("Simulación completada exitosamente.")
         return resultado
 

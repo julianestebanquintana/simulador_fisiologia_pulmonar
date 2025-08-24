@@ -1,6 +1,7 @@
 # Librerías
 import numpy as np
 
+
 class ControlRespiratorio:
     """
     Modelo de control respiratorio Proporcional-Integral (PI).
@@ -20,12 +21,15 @@ class ControlRespiratorio:
     generar_Pmus(t)
         Genera la señal P_mus(t) = A * sin(2π f t).
     """
-    def __init__(self,
-                 PACO2_target: float = 40.0,
-                 f_base: float = 12.0,
-                 Gp: float = 0.3,
-                 Gf: float = 0.1,
-                 Gi: float = 0.01):
+
+    def __init__(
+        self,
+        PACO2_target: float = 40.0,
+        f_base: float = 12.0,
+        Gp: float = 0.3,
+        Gf: float = 0.1,
+        Gi: float = 0.01,
+    ):
         # Valor de referencia de PaCO2 (mmHg)
         self.PACO2_target = PACO2_target
         # Frecuencia respiratoria basal (ciclos/min)
@@ -36,7 +40,7 @@ class ControlRespiratorio:
         # Convertir Gf de (ciclos/min)/mmHg a Hz/mmHg: Gf/60
         self.Gf = Gf / 60.0
         self.Gi = Gi  # Ganancia Integral
-        self.integral_error = 0.0 # Acumulador del error
+        self.integral_error = 0.0  # Acumulador del error
         # Variables de estado
         self.amplitud = None
         self.frecuencia = None
@@ -57,7 +61,9 @@ class ControlRespiratorio:
         self.amplitud = min(max(5.0, amplitud_calculada), 35.0)  # Mínimo 5 cmH2O
 
         # Asegurar una frecuencia mínima más alta
-        self.frecuencia = max(0.2, self.f_base/60.0 + self.Gf * error)  # Mínimo 0.2 Hz (12 rpm)
+        self.frecuencia = max(
+            0.2, self.f_base / 60.0 + self.Gf * error
+        )  # Mínimo 0.2 Hz (12 rpm)
         return self.amplitud, self.frecuencia
 
     def generar_Pmus(self, t: np.ndarray) -> np.ndarray:
